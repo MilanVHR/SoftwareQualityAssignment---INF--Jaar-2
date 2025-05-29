@@ -83,6 +83,8 @@ Hoofdletterongevoelig
 🔐 Passwords:
 12–30 tekens
 
+"can contain letters (a-z), (A-Z), numbers (0-9), Special characters such as ~!@#$%&_-+=`|\\(){}[]:;'<>,.?/"
+
 Moet 1 hoofdletter, 1 kleine letter, 1 cijfer en 1 speciaal teken bevatten
 
 🧪 Eisen aan het programma
