@@ -22,19 +22,7 @@ class Scooter:
     Mileage: int
     Last_Maintenance_Date: date
 
-    def __init__(
-        self,
-        Brand: str,
-        Model: str,
-        Serial_Number: str,
-        Top_Speed: int,
-        Battery_Capacity: int,
-        State_of_Charge: int,
-        Target_Range_SoC: int,
-        Location: tuple[float, float],
-        Is_Out_Of_Service: bool,
-        Mileage: int,
-        Last_Maintenance_Date: date
+    def __init__(self, Brand: str, Model: str, Serial_Number: str, Top_Speed: int, Battery_Capacity: int, State_of_Charge: int, Target_Range_SoC: int, Location: tuple[float, float], Is_Out_Of_Service: bool, Mileage: int, Last_Maintenance_Date: date
     ):
         self.Brand = Brand
         self.Model = Model
