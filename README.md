@@ -72,6 +72,8 @@ Super Admin kan back-ups maken en restore-codes genereren/invullen
 🧑‍💻 Usernames:
 8–10 tekens
 
+Unique zijn
+
 Start met letter of _
 
 Toegestane tekens: a-z, 0-9, _, ., '
