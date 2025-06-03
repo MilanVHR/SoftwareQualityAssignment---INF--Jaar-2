@@ -1,6 +1,11 @@
-def Main():
-    while (True):
-        user_input = input()
-        print(user_input)
+import sqlite3
+import Database.DBSetup as db
 
-Main()
+if __name__ == "__main__":
+    connection = sqlite3.connect('SQAssignmentDB.db')
+    cursor = connection.cursor()
+    db.SetupScooters(cursor)
+    db.SetupTraveller(cursor)
+    db.SetupServiceEngineer(cursor)
+    db.SetupSystemAdministrator(cursor)
+    db.SetupLog(cursor)
