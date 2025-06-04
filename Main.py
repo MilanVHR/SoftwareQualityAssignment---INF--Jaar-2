@@ -1,3 +1,5 @@
+import pwinput
+
 def super_admin_menu():
     while True:
         print("\n=== SUPER ADMIN MENU ===")
@@ -78,7 +80,7 @@ def login_menu():
     print("Log in als een gebruiker\n")
 
     username = input("Gebruikersnaam: ")
-    password = input("Wachtwoord: ")
+    password = pwinput.pwinput(prompt='Wachtwoord: ', mask='*')
 
     # TIJDELIJKk: hardcoded superadmin
     if username == "super_admin" and password == "Admin_123?":
