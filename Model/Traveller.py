@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
-# D = (0-9)
-# X = (A-Z)
+from sqlite3 import Connection
+
 class CityEnum(Enum):
     ROTTERDAM = "Rotterdam"
     AMSTERDAM = "Amsterdam"
@@ -13,14 +13,18 @@ class CityEnum(Enum):
     LEIDEN = "Leiden"
     DELFT = "Delft"
     BREDA = "Breda"
-    
+
+# D = (0-9)
+# X = (A-Z)
 class Traveller:
+    # XXDDDDDDD or XDDDDDDDD
+    Driving_License_Number: str
     First_Name: str
     Last_Name: str
     Birthday: date
     Gender: str
     Street_Name: str
-    House_Number: str
+    House_Number: int
     # DDDDXX
     Zip_Code: str
     # The system should generate a list of 10 predefined city names of your choice.
@@ -28,10 +32,10 @@ class Traveller:
     Email_Address: str
     # +31-6-DDDDDDDD Only DDDDDDDD to be entered by the user.
     Mobile_Phone: str
-    # XXDDDDDDD or XDDDDDDDD
-    Driving_License_Number: str
+    
 
-    def __init__(self, First_Name: str, Last_Name: str, Birthday: date, Gender: str, Street_Name: str, House_Number: str, Zip_Code: str, City: str, Email_Address: str, Mobile_Phone: str, Driving_License_Number: str):
+    def __init__(self, Driving_License_Number: str, First_Name: str, Last_Name: str, Birthday: date, Gender: str, Street_Name: str, House_Number: str, Zip_Code: str, City: CityEnum, Email_Address: str, Mobile_Phone: str):
+        self.Driving_License_Number = Driving_License_Number
         self.First_Name = First_Name
         self.Last_Name = Last_Name
         self.Birthday = Birthday
@@ -42,5 +46,16 @@ class Traveller:
         self.City = City
         self.Email_Address = Email_Address
         self.Mobile_Phone = Mobile_Phone
-        self.Driving_License_Number = Driving_License_Number
+    
+def addTravellerToDatabase(connection:Connection, traveller:Traveller):
+    connection.cursor().execute(
+    "INSERT INTO Travellers VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    (traveller.Driving_License_Number, traveller.First_Name, traveller.Last_Name, 
+    f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, 
+    traveller.House_Number, traveller.Zip_Code, traveller.City.value, 
+    traveller.Email_Address, traveller.Mobile_Phone))
+    connection.commit()
 
+def deleteTravellerFromDatabase(connection:Connection ,license_number: str):
+    connection.cursor().execute("DELETE FROM Travellers WHERE Driving_License_Number = ?", (license_number,))
+    connection.commit()

@@ -1,3 +1,5 @@
+import sqlite3
+import Database.DBSetup as db
 import pwinput
 
 def super_admin_menu():
@@ -91,4 +93,11 @@ def login_menu():
         # system_admin_menu() en service_engineer_menu() aanroepen
 
 if __name__ == "__main__":
+    connection = sqlite3.connect('SQAssignmentDB.db')
+    cursor = connection.cursor()
+    db.SetupScooters(cursor)
+    db.SetupTraveller(cursor)
+    db.SetupServiceEngineer(cursor)
+    db.SetupSystemAdministrator(cursor)
+    db.SetupLog(cursor)
     login_menu()
