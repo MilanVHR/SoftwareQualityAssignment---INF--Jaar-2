@@ -1,17 +1,19 @@
+import shutil
 import sqlite3
+import tempfile
 import zipfile
 import os
-import time
 from datetime import datetime
 
 def Backup_database():
-    # Create a folder where the backups are stoed if it does not exsist
     os.makedirs("Backups", exist_ok=True)
-
-    # Create a backup filename
     timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-    backup_db_filename = f'db_backup_{timestamp}.sq3'
-    backup_db_path = os.path.join("Backups", backup_db_filename)
+    
+    # Create a temporary file for the backup
+    with tempfile.NamedTemporaryFile() as tmpfile:
+        tmpfile.name = f'db_backup_{timestamp}.sq3'
+        backup_db_path = tmpfile.name
+    #os.rename(backup_db_path, f"b_backup_{timestamp}.sq3")
 
     # Make the backup
     with sqlite3.connect("SQAssignmentDB.db") as src, sqlite3.connect(backup_db_path) as dest:
@@ -21,9 +23,25 @@ def Backup_database():
     zip_filename = f'db_backup_{timestamp}.zip'
     zip_path = os.path.join("Backups", zip_filename)
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-        zf.write(backup_db_path, arcname=backup_db_filename)
+        zf.write(backup_db_path, arcname=os.path.basename(backup_db_path))
 
-    # This refuses to work, because the program its self locks the coppied .sq3 file.
-    # os.remove(backup_db_path)
 
     return zip_path
+
+def Restore_database(zip_name: str):
+    zip_path = os.path.join("Backups", zip_name)
+    
+    if not os.path.exists(zip_path):
+        raise FileNotFoundError(f"Backup {zip_name} not found")
+    
+    # Extract zip to temporary directory
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with zipfile.ZipFile(zip_path, 'r') as zf:
+            zf.extractall(tmpdir)
+        
+        # Find extracted .sq3 file
+        extracted_files = [f for f in os.listdir(tmpdir) if f.endswith('.sq3')]
+        backup_db = os.path.join(tmpdir, extracted_files[0])
+        
+        # Replace current database
+        shutil.move(backup_db, "SQAssignmentDB.db")
