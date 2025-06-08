@@ -49,13 +49,20 @@ class Traveller:
     
 def addTravellerToDatabase(connection:Connection, traveller:Traveller):
     connection.cursor().execute(
-    "INSERT INTO Travellers VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    (traveller.Driving_License_Number, traveller.First_Name, traveller.Last_Name, 
-    f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, 
-    traveller.House_Number, traveller.Zip_Code, traveller.City.value, 
-    traveller.Email_Address, traveller.Mobile_Phone))
+        "INSERT INTO Travellers VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (traveller.Driving_License_Number, traveller.First_Name, traveller.Last_Name, 
+        f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, 
+        traveller.House_Number, traveller.Zip_Code, traveller.City.value, 
+        traveller.Email_Address, traveller.Mobile_Phone))
     connection.commit()
 
 def deleteTravellerFromDatabase(connection:Connection ,license_number: str):
     connection.cursor().execute("DELETE FROM Travellers WHERE Driving_License_Number = ?", (license_number,))
+    connection.commit()
+
+def updateTravellerInDatabase(connection: Connection, traveller: Traveller):
+    connection.cursor().execute("""UPDATE Travellers
+        SET First_Name = ?, Last_Name = ?, Birthday = ?, Gender = ?, Street_Name = ?, House_Number = ?, Zip_Code = ?, City = ?, Email_Address = ?, Mobile_Phone = ?
+        WHERE Driving_License_Number = ?""", 
+        (traveller.First_Name, traveller.Last_Name, f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, traveller.House_Number, traveller.Zip_Code, traveller.City.value, traveller.Email_Address, traveller.Mobile_Phone, traveller.Driving_License_Number))
     connection.commit()

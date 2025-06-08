@@ -40,15 +40,20 @@ def addScooterToDatabase(connection:Connection, scooter:Scooter):
     connection.cursor().execute("""
         INSERT INTO Scooters 
             (Serial_Number, Brand, Model, Top_Speed, Battery_Capacity, State_of_Charge, Target_Range_SoC, Location, Is_Out_Of_Service, Mileage, Last_Maintenance_Date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, 
-    (scooter.Serial_Number, scooter.Brand, scooter.Model, 
-    scooter.Top_Speed, scooter.Battery_Capacity,scooter.State_of_Charge, 
-    scooter.Target_Range_SoC, f"{scooter.Location[0]}, {scooter.Location[1]}", scooter.Is_Out_Of_Service,
-    scooter.Mileage, f"{scooter.Last_Maintenance_Date}"))
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", 
+        (scooter.Serial_Number, scooter.Brand, scooter.Model, 
+        scooter.Top_Speed, scooter.Battery_Capacity,scooter.State_of_Charge, 
+        scooter.Target_Range_SoC, f"{scooter.Location[0]}, {scooter.Location[1]}", scooter.Is_Out_Of_Service,
+        scooter.Mileage, f"{scooter.Last_Maintenance_Date}"))
     connection.commit()
 
 def deleteScooterFromDatabase(connection:Connection, Serial_Number: int):
     connection.cursor().execute("DELETE FROM Scooters WHERE Serial_Number = ?", (Serial_Number,))
     connection.commit()
 
+def updateScooterInDatabase(connection: Connection, scooter: Scooter):
+    connection.cursor().execute("""UPDATE Scooters
+        SET Brand = ?, Model = ?, Top_Speed = ?, Battery_Capacity = ?, State_of_Charge = ?, Target_Range_SoC = ?, Location = ?, Is_Out_Of_Service = ?, Mileage = ?, Last_Maintenance_Date = ?
+        WHERE Serial_Number = ?""", 
+        (scooter.Brand, scooter.Model, scooter.Top_Speed, scooter.Battery_Capacity, scooter.State_of_Charge, scooter.Target_Range_SoC, f"{scooter.Location[0]}, {scooter.Location[1]}", scooter.Is_Out_Of_Service, scooter.Mileage, f"{scooter.Last_Maintenance_Date}", scooter.Serial_Number))
+    connection.commit()
