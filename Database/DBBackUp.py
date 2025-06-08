@@ -10,10 +10,8 @@ def Backup_database():
     timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
     
     # Create a temporary file for the backup
-    with tempfile.NamedTemporaryFile() as tmpfile:
-        tmpfile.name = f'db_backup_{timestamp}.sq3'
+    with tempfile.NamedTemporaryFile(suffix = ".sq3") as tmpfile:
         backup_db_path = tmpfile.name
-    #os.rename(backup_db_path, f"b_backup_{timestamp}.sq3")
 
     # Make the backup
     with sqlite3.connect("SQAssignmentDB.db") as src, sqlite3.connect(backup_db_path) as dest:
@@ -24,7 +22,6 @@ def Backup_database():
     zip_path = os.path.join("Backups", zip_filename)
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         zf.write(backup_db_path, arcname=os.path.basename(backup_db_path))
-
 
     return zip_path
 
