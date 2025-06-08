@@ -4,16 +4,17 @@ import os
 import time
 from datetime import datetime
 
-def backup_and_zip_sqlite(db_path):
+def Backup_database():
     # Create a folder where the backups are stoed if it does not exsist
     os.makedirs("Backups", exist_ok=True)
 
     # Create a backup filename
-    backup_db_filename = f'db_backup_{datetime.now().strftime('%Y%m%d-%H%M%S')}.sq3'
+    timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+    backup_db_filename = f'db_backup_{timestamp}.sq3'
     backup_db_path = os.path.join("Backups", backup_db_filename)
 
     # Make the backup
-    with sqlite3.connect(db_path) as src, sqlite3.connect(backup_db_path) as dest:
+    with sqlite3.connect("SQAssignmentDB.db") as src, sqlite3.connect(backup_db_path) as dest:
         src.backup(dest)
 
     # Zip the backup
