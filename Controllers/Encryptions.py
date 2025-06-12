@@ -18,7 +18,6 @@ def encrypt(message):
 
 # decrypt a given string
 def decrypt(message):
-    key = "VeiligeEncryption"
     fernet = Fernet(key)
     decMessage = fernet.decrypt(message).decode()
     return decMessage
