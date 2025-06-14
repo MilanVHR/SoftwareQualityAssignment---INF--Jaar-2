@@ -1,9 +1,7 @@
-
-
-
-
-
+from datetime import datetime
+from Controllers.Validations import isSerialNumberValid
 from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
+from Model.Scooter import addScooterToDatabase, Scooter
 
 
 def system_admin_menu():
@@ -77,7 +75,7 @@ def backup_restore_submenu():
         else:
             print("Ongeldige keuze.")
 
-def add_scooter_menu():
+def add_scooter_menu(connection):
     brand = input("Voer de brand van de scooter in:")
     model = input("Voer de model van de scooter in:")
     serial_number = "@@@"
@@ -90,22 +88,21 @@ def add_scooter_menu():
     
     top_speed_input = ""
     while not top_speed_input.isnumeric() or int(top_speed_input) < 0:
-        top_speed_input = input("Voer de top speed van de scooter in, alleen nummer:")
+        top_speed_input = input("Voer de top speed van de scooter in, alleen nummer en grooter dan 0: ")
+        if not top_speed_input.isnumeric():
+            print("Gebruik alleen maar nummers")
+        if top_speed_input.isnumeric() and int(top_speed_input) < 0:
+            print("Top speed moet grooter dan")
     top_speed = int(top_speed_input)
     
     battery_capacity_input = ""
     while not battery_capacity_input.isnumeric() or int(battery_capacity_input) < 0:
-        battery_capacity_input = input("Voer de batterijcapaciteit de scooter in, alleen nummer:")
-    battery_capacity = int(battery_capacity_input)
-
-    battery_capacity_input = ""
-    while not battery_capacity_input.isnumeric() or int(battery_capacity_input) < 0:
-        battery_capacity_input = input("Voer de batterijcapaciteit de scooter in, alleen nummer:")
+        battery_capacity_input = input("Voer de batterijcapaciteit de scooter in, alleen nummer en grooter dan 0: ")
     battery_capacity = int(battery_capacity_input)
 
     soc_input = ""
     while not soc_input.isnumeric() or not (0 <= int(soc_input) <= 100):
-        soc_input = input("Voer de State of Charge (0-100%) in:")
+        soc_input = input("Voer de State of Charge (0-100%) in: ")
     state_of_charge = int(soc_input)
 
     min_soc = -1
@@ -113,12 +110,12 @@ def add_scooter_menu():
     while max_soc < min_soc:
         min_soc_input = ""
         while not min_soc_input.isnumeric() or not (0 <= int(min_soc_input) <= 100):
-            min_soc_input = input("Voer het minimale Target Range SoC in (0-100):")
+            min_soc_input = input("Voer het minimale Target Range SoC in (0-100): ")
         min_soc = int(min_soc_input)
 
         max_soc_input = ""
         while not max_soc_input.isnumeric() or not (0 <= int(max_soc_input) <= 100) or int(max_soc_input) < min_soc:
-            max_soc_input = input(f"Voer het maximale Target Range SoC in (tussen {min_soc} en 100):")
+            max_soc_input = input(f"Voer het maximale Target Range SoC in (tussen {min_soc} en 100): ")
         max_soc = int(max_soc_input)
         if max_soc < min_soc:
             print("het minimale target range is grooter dan maximale range")
@@ -127,8 +124,8 @@ def add_scooter_menu():
     location_valid = False
     while not location_valid:
         try:
-            lat = float(input("Voer de latitude in:"))
-            lon = float(input("Voer de longitude in:"))
+            lat = float(input("Voer de latitude in: "))
+            lon = float(input("Voer de longitude in: "))
             location = (lat, lon)
             location_valid = True
         except ValueError:
@@ -136,7 +133,7 @@ def add_scooter_menu():
 
     valid_oos = False
     while not valid_oos:
-        out_of_service_input = input("Is de scooter buiten gebruik? (ja/nee):").strip().lower()
+        out_of_service_input = input("Is de scooter buiten gebruik? (ja/nee): ").strip().lower()
         if out_of_service_input in ("ja", "nee"):
             is_out_of_service = out_of_service_input == "ja"
             valid_oos = True
@@ -145,12 +142,12 @@ def add_scooter_menu():
 
     mileage_input = ""
     while not mileage_input.isnumeric() or int(mileage_input) < 0:
-        mileage_input = input("Voer de kilometerstand in (alleen nummer):")
+        mileage_input = input("Voer de kilometerstand in (alleen nummer): ")
     mileage = int(mileage_input)
 
     valid_date = False
     while not valid_date:
-        date_input = input("Voer de laatste onderhoudsdatum in (DD-MM-YYYY):")
+        date_input = input("Voer de laatste onderhoudsdatum in (DD-MM-YYYY): ")
         try:
             last_maintenance_date = datetime.strptime(date_input, "%d-%m-%Y").date()
             valid_date = True
@@ -158,5 +155,5 @@ def add_scooter_menu():
             print("Ongeldige datum, probeer opnieuw.")
 
     toAdd = Scooter(serial_number, brand, model, top_speed, battery_capacity, state_of_charge, target_range_soc, location, is_out_of_service, mileage, last_maintenance_date)
-    addScooterToDatabase(toAdd)
+    addScooterToDatabase(connection, toAdd)
 
