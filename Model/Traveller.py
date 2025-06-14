@@ -1,6 +1,8 @@
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 from sqlite3 import Connection
+
+from Encryption.Encryptor import Decrypt, Encrypt
 
 class CityEnum(Enum):
     ROTTERDAM = "Rotterdam"
@@ -48,12 +50,24 @@ class Traveller:
         self.Mobile_Phone = Mobile_Phone
     
 def addTravellerToDatabase(connection:Connection, traveller:Traveller):
-    connection.cursor().execute(
-        "INSERT INTO Travellers VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (traveller.Driving_License_Number, traveller.First_Name, traveller.Last_Name, 
-        f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, 
-        traveller.House_Number, traveller.Zip_Code, traveller.City.value, 
-        traveller.Email_Address, traveller.Mobile_Phone))
+    encryptedData = encryptTraveller(traveller)
+    connection.cursor().execute(""" INSERT INTO Travellers (
+            FirstName, LastName, Birthday, Gender, StreetName, HouseNumber, 
+            ZipCode, City, EmailAddress, MobilePhone, DrivingLicenseNumber
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            encryptedData['Driving_License_Number'],
+            encryptedData['First_Name'],
+            encryptedData['Last_Name'],
+            encryptedData['Birthday'],
+            encryptedData['Gender'],
+            encryptedData['Street_Name'],
+            encryptedData['House_Number'],
+            encryptedData['Zip_Code'],
+            encryptedData['City'],
+            encryptedData['Email_Address'],
+            encryptedData['Mobile_Phone']
+        ))
     connection.commit()
 
 def deleteTravellerFromDatabase(connection:Connection ,license_number: str):
@@ -66,3 +80,113 @@ def updateTravellerInDatabase(connection: Connection, traveller: Traveller):
         WHERE Driving_License_Number = ?""", 
         (traveller.First_Name, traveller.Last_Name, f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, traveller.House_Number, traveller.Zip_Code, traveller.City.value, traveller.Email_Address, traveller.Mobile_Phone, traveller.Driving_License_Number))
     connection.commit()
+
+def encryptTraveller(traveller: Traveller):
+    encrypted_data = {}
+    
+    # Encrypt each field by converting to string, encoding to bytes, then encrypting
+    encrypted_data['Driving_License_Number'] = Encrypt(traveller.Driving_License_Number)
+    encrypted_data['First_Name'] = Encrypt(traveller.First_Name)
+    encrypted_data['Last_Name'] = Encrypt(traveller.Last_Name)
+    encrypted_data['Birthday'] = Encrypt(traveller.Birthday)
+    encrypted_data['Gender'] = Encrypt(traveller.Gender)
+    encrypted_data['Street_Name'] = Encrypt(traveller.Street_Name)
+    encrypted_data['House_Number'] = Encrypt(traveller.House_Number)
+    encrypted_data['Zip_Code'] = Encrypt(traveller.Zip_Code)
+    encrypted_data['City'] = Encrypt(traveller.City)
+    encrypted_data['Email_Address'] = Encrypt(traveller.Email_Address)
+    encrypted_data['Mobile_Phone'] = Encrypt(traveller.Mobile_Phone)
+    
+    return encrypted_data
+
+def decryptTraveller(encrypted_data):
+    return Traveller(
+        Driving_License_Number=Decrypt(encrypted_data['Driving_License_Number']),
+        First_Name=Decrypt(encrypted_data['First_Name']),
+        Last_Name=Decrypt(encrypted_data['Last_Name']),
+        Birthday=Decrypt(encrypted_data['Birthday']),
+        Gender=Decrypt(encrypted_data['Gender']),
+        Street_Name=Decrypt(encrypted_data['Street_Name']),
+        House_Number=Decrypt(encrypted_data['House_Number']),
+        Zip_Code=Decrypt(encrypted_data['Zip_Code']),
+        City=Decrypt(encrypted_data['City']),
+        Email_Address=Decrypt(encrypted_data['Email_Address']),
+        Mobile_Phone=Decrypt(encrypted_data['Mobile_Phone'])
+    )
+
+def findTravellers(cursor, Driving_License_Number=None, First_Name=None, Last_Name=None, Birthday=None, Gender=None, Street_Name=None, House_Number=None, Zip_Code=None, City=None, Email_Address=None, Mobile_Phone=None
+):
+    cursor.execute("SELECT * FROM Travellers")
+    # Fetching all isnt a very good idea in production
+    # however I have not foun a way to support partial
+    # parameters and encrypted columns
+    encrypted_rows = cursor.fetchall()
+    travellers = []
+
+    for row in encrypted_rows:
+        encrypted_data = {
+            'Driving_License_Number': row[1],
+            'First_Name': row[2],
+            'Last_Name': row[3],
+            'Birthday': row[4],
+            'Gender': row[5],
+            'Street_Name': row[6],
+            'House_Number': row[7],
+            'Zip_Code': row[8],
+            'City': row[9],
+            'Email_Address': row[10],
+            'Mobile_Phone': row[11]
+        }
+
+        # Use decryptTraveller to get a Traveller object
+        traveller = decryptTraveller(encrypted_data)
+
+        # the " ... is not None check" just skips that parameter if it has not been provided in the function
+        if (
+        Driving_License_Number is not None and 
+        str(Driving_License_Number).lower() not in str(traveller.Driving_License_Number).lower()):
+            continue
+        if (
+        First_Name is not None and 
+        str(First_Name).lower() not in str(traveller.First_Name).lower()):
+            continue
+        if (
+        Last_Name is not None and 
+        str(Last_Name).lower() not in str(traveller.Last_Name).lower()):
+            continue
+        if (
+        Birthday is not None and 
+        str(Birthday) not in str(traveller.Birthday)):
+            continue
+        if (
+        Gender is not None and 
+        str(Gender).lower() not in str(traveller.Gender).lower()):
+            continue
+        if (
+        Street_Name is not None and 
+        str(Street_Name).lower() not in str(traveller.Street_Name).lower()):
+            continue
+        if (
+        House_Number is not None and 
+        str(House_Number) not in str(traveller.House_Number)):
+            continue
+        if (
+        Zip_Code is not None and 
+        str(Zip_Code).lower() not in str(traveller.Zip_Code).lower()):
+            continue
+        if (
+        City is not None and 
+        str(City).lower() not in str(traveller.City).lower()):
+            continue
+        if (
+        Email_Address is not None and 
+        str(Email_Address).lower() not in str(traveller.Email_Address).lower()):
+            continue
+        if (
+        Mobile_Phone is not None and 
+        str(Mobile_Phone).lower() not in str(traveller.Mobile_Phone).lower()):
+            continue
+
+        travellers.append(traveller)
+
+    return travellers
