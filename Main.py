@@ -73,7 +73,7 @@ def service_engineer_menu(current_user):
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            own_profile_menu(current_user)
+            own_profile_menu(current_user) # (nog te implementeren)
         elif choice == "2":
             update_scooter_attributes(current_user)
         elif choice == "3":
@@ -263,7 +263,7 @@ def delete_system_admin():
 def reset_system_admin_password():
     print("\n--- Reset wachtwoord System Admin ---")
     username = input("Gebruikersnaam van de admin: ")
-    temp_password = "TempPass123!"  # Of genereer willekeurig
+    temp_password = "TempPass123!"  # Is nu hardcoded, kan willekeurig worden nog
     
     #  password reset logica + e-mail of melding
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.") # (nog te implementeren)
