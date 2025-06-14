@@ -29,7 +29,7 @@ def service_engineer_menu():
 
 
 
-def update_scooter_attributes(user):
+def update_scooter_attributes():
     print("\n--- Scootergegevens bijwerken (alleen toegestane velden) ---")
     scooter_id = input("Voer het ID of serienummer van de scooter in: ")
 
@@ -74,44 +74,4 @@ def update_scooter_attributes(user):
 
 
 def search_scooter():
-    print("\n--- Scooter zoeken ---")
-    search_term = input(
-        "Voer een zoekterm in (ID, merk, model of serienummer): ")
-
-    conn = sqlite3.connect("urban_mobility.db")
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        SELECT id, Brand, Model, Serial_Number, Top_Speed, State_Of_Charge, Is_Out_Of_Service, Mileage
-        FROM scooters
-        WHERE
-            Brand LIKE ? OR
-            Model LIKE ? OR
-            Serial_Number LIKE ? OR
-            CAST(id AS TEXT) LIKE ?
-    ''', (
-        f"%{search_term}%",
-        f"%{search_term}%",
-        f"%{search_term}%",
-        f"%{search_term}%"
-    ))
-
-    results = cursor.fetchall()
-    conn.close()
-
-    if not results:
-        print("Geen scooters gevonden.")
-        return
-
-    print(f"\n{len(results)} scooter(s) gevonden:\n")
-    for scooter in results:
-        print(f"""
-Scooter ID: {scooter[0]}
-Merk & Model: {scooter[1]} {scooter[2]}
-Serienummer: {scooter[3]}
-Topsnelheid: {scooter[4]} km/u
-SoC: {scooter[5]}%
-Uit dienst: {'Ja' if scooter[6] else 'Nee'}
-Kilometerstand: {scooter[7]} km
-------------------------------
-        """)
+    return

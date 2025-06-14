@@ -2,6 +2,7 @@ import sqlite3
 import Database.DBSetup as db
 import pwinput
 
+from Menus.Service_Engineer_Menu import service_engineer_menu
 from Menus.Super_Admin_Menu import super_admin_menu
 from Menus.System_Admin_Menu import system_admin_menu
 
@@ -19,7 +20,9 @@ def login_menu():
     if username == "super_admin" and password == "Admin_123?":
         super_admin_menu()
     elif username == "system_admin" and password == "System_123?":
-        system_admin_menu()
+        system_admin_menu() #TIJDELIJK
+    elif username == "service_engineer" and password == "Service_123?":
+        service_engineer_menu() #TIJDELIJK
     else:
         # Checken in de databasse
         print("Onjuiste inloggegevens of nog niet geïmplementeerd.")
