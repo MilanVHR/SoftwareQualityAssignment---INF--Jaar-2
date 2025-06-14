@@ -24,11 +24,7 @@ def log(description:str, Username:str = "", additional:str = "", critical:bool =
     current_date = current_datetime.date()
     current_time = current_datetime.time()
 
-    suspicious
-    if (critical):
-        suspicious = "Yes"
-    else:
-        suspicious = "No"
+    suspicious = "Yes" if critical else "no"
 
     logString(f"{current_date}, {current_time}, {Username}, {description}, {additional}, {suspicious}")
 

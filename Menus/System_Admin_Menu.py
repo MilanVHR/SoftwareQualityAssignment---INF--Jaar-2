@@ -3,6 +3,7 @@
 
 
 
+from Controllers.Logging import log
 from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
 
 
@@ -46,10 +47,13 @@ def backup_restore_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
+            log("back up created", "system_admin")
             print("→  Backup maken") # (nog te implementeren)
         elif choice == "2":
+            log("restore code generated", "system_admin")
             print("→  Restore-code genereren") # (nog te implementeren)
         elif choice == "3":
+            log("restore code deleted", "system_admin")
             print("→  Restore-code intrekken") # (nog te implementeren)
         elif choice == "0":
             break

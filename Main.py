@@ -1,6 +1,7 @@
 import sqlite3
 import Database.DBSetup as db
 import pwinput
+from Controllers.Logging import log
 
 from Menus.Super_Admin_Menu import super_admin_menu
 from Menus.System_Admin_Menu import system_admin_menu
@@ -17,11 +18,14 @@ def login_menu():
 
     # TIJDELIJKk: hardcoded superadmin
     if username == "super_admin" and password == "Admin_123?":
+        log("logged in", username)
         super_admin_menu()
     elif username == "system_admin" and password == "System_123?":
+        log("logged in", username)
         system_admin_menu()
     else:
         # Checken in de databasse
+        log("Unsuccessful login", additional=f"username: \"{username}\" is used for a login attempt with a wrong password", critical=True)
         print("Onjuiste inloggegevens of nog niet geïmplementeerd.")
         # system_admin_menu() en service_engineer_menu() aanroepen
 
