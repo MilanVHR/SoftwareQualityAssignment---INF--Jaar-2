@@ -28,8 +28,10 @@ def log(description:str, Username:str = "", additional:str = "", critical:bool =
     suspicious
     if (critical):
         suspicious = "Yes"
+    else:
+        suspicious = "No"
 
-    logString(f"{current_date}, {current_time}, {Username}, {description}, {additional}, {critical}")
+    logString(f"{current_date}, {current_time}, {Username}, {description}, {additional}, {suspicious}")
 
 
 def readLog():
