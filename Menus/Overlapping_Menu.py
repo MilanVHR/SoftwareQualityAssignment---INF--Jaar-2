@@ -1,6 +1,5 @@
 import sqlite3
 import pwinput
-import bcrypt
 
 
 def own_profile_submenu(current_user):
@@ -133,36 +132,7 @@ def update_own_name(user):
 
 
 def change_own_password(user):
-    conn = sqlite3.connect("urban_mobility.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT password_hash FROM users WHERE LOWER(username)=?", (user["username"].lower(),))
-    result = cursor.fetchone()
-
-    if not result:
-        print("Gebruiker niet gevonden.")
-        conn.close()
-        return
-
-    current_pw = pwinput.pwinput("Huidig wachtwoord: ", mask="*")
-    if not bcrypt.checkpw(current_pw.encode(), result[0].encode()):
-        print("Onjuist wachtwoord.")
-        conn.close()
-        return
-
-    new_pw = pwinput.pwinput("Nieuw wachtwoord: ", mask="*")
-    confirm_pw = pwinput.pwinput("Bevestig nieuw wachtwoord: ", mask="*")
-
-    if new_pw != confirm_pw:
-        print("Wachtwoorden komen niet overeen.")
-        conn.close()
-        return
-
-    hashed_pw = bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode()
-    cursor.execute("UPDATE users SET password_hash=? WHERE LOWER(username)=?", (hashed_pw, user["username"].lower()))
-    conn.commit()
-    conn.close()
-    print("Wachtwoord succesvol gewijzigd.")
+    return
 
 
 def delete_own_account(user):
