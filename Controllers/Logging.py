@@ -1,5 +1,5 @@
 from Encryption.Encryptor import Decrypt, Encrypt
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 logFilePath = "./Logs/log.txt"
@@ -18,7 +18,7 @@ def logString(message, critical = False):
 
 def log(description:str, Username:str = "", additional:str = "", critical:bool = False ):
     # Get the current date and time
-    current_datetime = datetime.now()
+    current_datetime = datetime.now(timezone.utc)
 
     # Extract date and time separately
     current_date = current_datetime.date()
