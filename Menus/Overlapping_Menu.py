@@ -1,4 +1,9 @@
-def own_profile_submenu():  # (nog te implementeren)
+import sqlite3
+import pwinput
+import bcrypt
+
+
+def own_profile_submenu(current_user):
     while True:
         print("\n--- Beheer Eigen Profiel ---")
         print("1. Bekijk profiel")
@@ -10,17 +15,15 @@ def own_profile_submenu():  # (nog te implementeren)
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            break
+            view_own_profile(current_user)
         elif choice == "2":
-            break
+            update_own_name(current_user)
         elif choice == "3":
-            break
+            change_own_password(current_user)
         elif choice == "4":
-            break
+            delete_own_account(current_user)
         elif choice == "0":
             break
-        else:
-            print("Ongeldige keuze.")
 
 
 def service_engineer_submenu():
@@ -93,3 +96,84 @@ def scooter_submenu():
             break
         else:
             print("Ongeldige keuze.")
+
+
+def view_own_profile(user):
+    conn = sqlite3.connect("urban_mobility.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT first_name, last_name, registration_date FROM users WHERE LOWER(username)=?", (user["username"].lower(),))
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        print("\n👤 Profielgegevens:")
+        print(f"Voornaam: {result[0]}")
+        print(f"Achternaam: {result[1]}")
+        print(f"Geregistreerd op: {result[2]}")
+    else:
+        print("Profiel niet gevonden.")
+
+
+def update_own_name(user):
+    first = input("Nieuwe voornaam (Enter om te behouden): ")
+    last = input("Nieuwe achternaam (Enter om te behouden): ")
+
+    conn = sqlite3.connect("urban_mobility.db")
+    cursor = conn.cursor()
+
+    if first:
+        cursor.execute("UPDATE users SET first_name=? WHERE LOWER(username)=?", (first, user["username"].lower()))
+    if last:
+        cursor.execute("UPDATE users SET last_name=? WHERE LOWER(username)=?", (last, user["username"].lower()))
+
+    conn.commit()
+    conn.close()
+    print("Naam bijgewerkt.")
+
+
+
+def change_own_password(user):
+    conn = sqlite3.connect("urban_mobility.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT password_hash FROM users WHERE LOWER(username)=?", (user["username"].lower(),))
+    result = cursor.fetchone()
+
+    if not result:
+        print("Gebruiker niet gevonden.")
+        conn.close()
+        return
+
+    current_pw = pwinput.pwinput("Huidig wachtwoord: ", mask="*")
+    if not bcrypt.checkpw(current_pw.encode(), result[0].encode()):
+        print("Onjuist wachtwoord.")
+        conn.close()
+        return
+
+    new_pw = pwinput.pwinput("Nieuw wachtwoord: ", mask="*")
+    confirm_pw = pwinput.pwinput("Bevestig nieuw wachtwoord: ", mask="*")
+
+    if new_pw != confirm_pw:
+        print("Wachtwoorden komen niet overeen.")
+        conn.close()
+        return
+
+    hashed_pw = bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode()
+    cursor.execute("UPDATE users SET password_hash=? WHERE LOWER(username)=?", (hashed_pw, user["username"].lower()))
+    conn.commit()
+    conn.close()
+    print("Wachtwoord succesvol gewijzigd.")
+
+
+def delete_own_account(user):
+    confirm = input(f"Weet je zeker dat je jouw account '{user['username']}' wilt verwijderen? (ja/nee): ")
+    if confirm.lower() == "ja":
+        conn = sqlite3.connect("urban_mobility.db")
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users WHERE LOWER(username)=?", (user["username"].lower(),))
+        conn.commit()
+        conn.close()
+        print(" Account verwijderd. Je bent nu uitgelogd.")
+        exit()  # Verlaat de applicatie na verwijderen
+    else:
+        print("Verwijdering geannuleerd.")

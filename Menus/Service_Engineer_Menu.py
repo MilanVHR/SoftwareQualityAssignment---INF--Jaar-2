@@ -29,7 +29,7 @@ def service_engineer_menu():
 
 
 
-def update_scooter_attributes(user):
+def update_scooter_attributes():
     print("\n--- Scootergegevens bijwerken (alleen toegestane velden) ---")
     scooter_id = input("Voer het ID of serienummer van de scooter in: ")
 
