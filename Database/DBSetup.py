@@ -20,27 +20,28 @@ def SetupScooters(cursor:Cursor):
 def SetupTraveller(cursor:Cursor):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Travellers (
-            Driving_License_Number CHAR(9) PRIMARY KEY NOT NULL,
-            First_Name VARCHAR,
-            Last_Name VARCHAR,
-            Birthday DATE,
-            Gender VARCHAR,
-            Street_Name VARCHAR,
-            House_Number INT,
-            Zip_Code CHAR(6),
-            City VARCHAR,
-            Email_Address VARCHAR,
-            Mobile_Phone VARCHAR
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            FirstName BLOB,
+            LastName BLOB,
+            Birthday BLOB,
+            Gender BLOB,
+            StreetName BLOB,
+            HouseNumber BLOB,
+            ZipCode BLOB,
+            City BLOB,
+            EmailAddress BLOB,
+            MobilePhone BLOB,
+            DrivingLicenseNumber BLOB UNIQUE
         )
     ''')
 
 def SetupServiceEngineer(cursor:Cursor):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Service_Engineers (
-            Username VARCHAR PRIMARY KEY NOT NULL,
-            Password VARCHAR,
-            First_Name VARCHAR,
-            Last_Name VARCHAR,
+            Username BLOB PRIMARY KEY NOT NULL,  
+            Password BLOB,                      
+            First_Name BLOB,                    
+            Last_Name BLOB,                     
             Registration_date DATE
         )
     ''')
@@ -48,10 +49,10 @@ def SetupServiceEngineer(cursor:Cursor):
 def SetupSystemAdministrator(cursor:Cursor):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS System_Administrators (
-            Username VARCHAR PRIMARY KEY NOT NULL,
-            Password VARCHAR,
-            First_Name VARCHAR,
-            Last_Name VARCHAR,
+            Username BLOB PRIMARY KEY NOT NULL,  
+            Password BLOB,                      
+            First_Name BLOB,                    
+            Last_Name BLOB,                     
             Registration_date DATE
         )
     ''')
@@ -60,11 +61,11 @@ def SetupLog(cursor:Cursor):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Logs (
             Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            Date DATE,
-            Time VARCHAR,
-            Username VARCHAR,
-            Description_of_activity DATE,
-            Additional_Information VARCHAR,
+            Date BLOB,                         
+            Time BLOB,                         
+            Username BLOB,                     
+            Description_of_activity BLOB,      
+            Additional_Information BLOB,       
             Suspicious BOOLEAN
         )
     ''')

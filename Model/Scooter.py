@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from sqlite3 import Connection
 
 
@@ -57,3 +57,67 @@ def updateScooterInDatabase(connection: Connection, scooter: Scooter):
         WHERE Serial_Number = ?""", 
         (scooter.Brand, scooter.Model, scooter.Top_Speed, scooter.Battery_Capacity, scooter.State_of_Charge, scooter.Target_Range_SoC, f"{scooter.Location[0]}, {scooter.Location[1]}", scooter.Is_Out_Of_Service, scooter.Mileage, f"{scooter.Last_Maintenance_Date}", scooter.Serial_Number))
     connection.commit()
+
+def findScooters(cursor, Serial_Number=None, Brand=None, Model=None, Top_Speed=None, Battery_Capacity=None, State_of_Charge=None, Target_Range_SoC=None, Location=None, Is_Out_Of_Service=None, Mileage=None, Last_Maintenance_Date=None, amount=None):
+    query = "SELECT * FROM Scooters"
+    conditions = []
+    params = []
+
+    # Partial match for string columns using LIKE and wildcards
+    if Serial_Number is not None:
+        conditions.append("Serial_Number LIKE ?")
+        params.append(f"%{Serial_Number}%")
+    if Brand is not None:
+        conditions.append("Brand LIKE ?")
+        params.append(f"%{Brand}%")
+    if Model is not None:
+        conditions.append("Model LIKE ?")
+        params.append(f"%{Model}%")
+    if Target_Range_SoC is not None:
+        conditions.append("Target_Range_SoC LIKE ?")
+        params.append(f"%{Target_Range_SoC}%")
+    if Location is not None:
+        conditions.append("Location LIKE ?")
+        params.append(f"%{Location}%")
+
+    # Exact match for numeric, boolean, and date columns
+    if Top_Speed is not None:
+        conditions.append("Top_Speed = ?")
+        params.append(Top_Speed)
+    if Battery_Capacity is not None:
+        conditions.append("Battery_Capacity = ?")
+        params.append(Battery_Capacity)
+    if State_of_Charge is not None:
+        conditions.append("State_of_Charge = ?")
+        params.append(State_of_Charge)
+    if Is_Out_Of_Service is not None:
+        conditions.append("Is_Out_Of_Service = ?")
+        params.append(Is_Out_Of_Service)
+    if Mileage is not None:
+        conditions.append("Mileage = ?")
+        params.append(Mileage)
+    if Last_Maintenance_Date is not None:
+        conditions.append("Last_Maintenance_Date = ?")
+        params.append(Last_Maintenance_Date)
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    if amount is not None:
+        query += " LIMIT ?"
+        params.append(amount)
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    scooters = []
+    
+    for row in rows:
+        (Serial_Number, Brand, Model, Top_Speed, Battery_Capacity, State_of_Charge, Target_Range_SoC, Location_str, Is_Out_Of_Service, Mileage, Last_Maintenance_Date
+        ) = row
+        latitude, longitude = map(float, Location_str.split(","))
+        Location_tuple = (latitude, longitude)
+        Last_Maintenance_Date = datetime.strptime(Last_Maintenance_Date, "%Y-%m-%d").date()
+        
+        scooter = Scooter(Serial_Number=Serial_Number, Brand=Brand, Model=Model, Top_Speed=Top_Speed, Battery_Capacity=Battery_Capacity, State_of_Charge=State_of_Charge, Target_Range_SoC=Target_Range_SoC, Location=Location_tuple, Is_Out_Of_Service=bool(Is_Out_Of_Service), Mileage=Mileage, Last_Maintenance_Date=Last_Maintenance_Date)
+        scooters.append(scooter)
+
+    return scooters 

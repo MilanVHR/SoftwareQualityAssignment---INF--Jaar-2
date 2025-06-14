@@ -1,6 +1,8 @@
 from datetime import date
 from sqlite3 import Connection
 
+from Encryption.Encryptor import Encrypt, Hash
+
 class Service_Engineer:
     Username: str
     Password: str
@@ -19,16 +21,16 @@ def addServiceEngineerToDatabase(connection:Connection, engineer:Service_Enginee
     connection.cursor().execute("""INSERT INTO Service_Engineers 
         (Username, Password, First_Name, Last_Name, Registration_date) 
         VALUES (?, ?, ?, ?, ?)""",
-        (engineer.Username, engineer.Password, engineer.First_Name, engineer.Last_Name, f"{engineer.Registration_date}"))
+        (Encrypt(engineer.Username), Hash(engineer.Password), Encrypt(engineer.First_Name), Encrypt(engineer.Last_Name), f"{engineer.Registration_date}"))
     connection.commit()
 
 def deleteServiceEngineerFromDatabase(connection:Connection ,Username: str):
-    connection.cursor().execute("DELETE FROM Service_Engineers WHERE Username = ?", (Username,))
+    connection.cursor().execute("DELETE FROM Service_Engineers WHERE Username = ?", (Encrypt(Username),))
     connection.commit()
 
 def updateServiceEngineerInDatabase(connection: Connection, engineer: Service_Engineer):
     connection.cursor().execute("""UPDATE Service_Engineers
         SET Password = ?, First_Name = ?, Last_Name = ?, Registration_date = ?
         WHERE Username = ?""", 
-        (engineer.Password,engineer.First_Name,engineer.Last_Name,f"{engineer.Registration_date}",engineer.Username))
+        (Hash(engineer.Password), Encrypt(engineer.First_Name), Encrypt(engineer.Last_Name), f"{engineer.Registration_date}", Encrypt(engineer.Username)))
     connection.commit()
