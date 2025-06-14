@@ -1,6 +1,10 @@
 
 
-from Menus.System_Admin_Menu import backup_restore_submenu, scooter_submenu
+
+
+
+from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu
+from Menus.System_Admin_Menu import backup_restore_submenu
 
 
 def super_admin_menu():
@@ -56,51 +60,9 @@ def system_admin_submenu():
         else:
             print("Ongeldige keuze.")
 
-def service_engineer_submenu():
-    while True:
-        print("\n--- Beheer Service Engineers ---")
-        print("1. Nieuwe Service Engineer toevoegen")
-        print("2. Gegevens van Service Engineer wijzigen")
-        print("3. Service Engineer verwijderen")
-        print("4. Wachtwoord resetten")
-        print("0. Terug naar hoofdmenu")
 
-        choice = input("Maak een keuze: ")
-        if choice == "1":
-            print("→ Toevoegen van een Service Engineer") # (nog te implementeren) 
-        elif choice == "2":
-            print("→  Wijzigen van een Service Engineer") # (nog te implementeren)
-        elif choice == "3":
-            print("→  Verwijderen van een Service Engineer") # (nog te implementeren)
-        elif choice == "4":
-            print("→  Reset wachtwoord voor een Service Engineer") # (nog te implementeren)
-        elif choice == "0":
-            break
-        else:
-            print("Ongeldige keuze.")
 
-def traveller_submenu():
-    while True:
-        print("\n--- Beheer Travellers ---")
-        print("1. Nieuwe Traveller toevoegen")
-        print("2. Travellergegevens wijzigen")
-        print("3. Traveller verwijderen")
-        print("4. Traveller zoeken")
-        print("0. Terug naar hoofdmenu")
 
-        choice = input("Maak een keuze: ")
-        if choice == "1":
-            print("→  Toevoegen van een Traveller") # (nog te implementeren)
-        elif choice == "2":
-            print("→  Wijzigen van een Traveller") # (nog te implementeren)
-        elif choice == "3":
-            print("→  Verwijderen van een Traveller") # (nog te implementeren)
-        elif choice == "4":
-            print("→  Zoekfunctie voor Traveller") # (nog te implementeren)
-        elif choice == "0":
-            break
-        else:
-            print("Ongeldige keuze.")
 
 def system_admin_submenu():
     while True:
@@ -166,27 +128,3 @@ def reset_system_admin_password():
     
     #  password reset logica + e-mail of melding
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.") # (nog te implementeren)
-
-def own_profile_submenu(current_user): # (nog te implementeren)
-    while True:
-        print("\n--- Beheer Eigen Profiel ---")
-        print("1. Bekijk profiel")
-        print("2. Wijzig voornaam of achternaam")
-        print("3. Wijzig wachtwoord")
-        print("4. Verwijder mijn account")
-        print("0. Terug")
-
-        choice = input("Maak een keuze: ")
-
-        if choice == "1":
-            break
-        elif choice == "2":
-            break
-        elif choice == "3":
-            break
-        elif choice == "4":
-            break
-        elif choice == "0":
-            break
-        else:
-            print("Ongeldige keuze.")

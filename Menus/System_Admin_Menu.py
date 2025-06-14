@@ -1,7 +1,9 @@
-from datetime import datetime
-from Controllers.Validations import isSerialNumberValid
-from Model.Scooter import Scooter, addScooterToDatabase
 
+
+
+
+
+from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
 
 
 def system_admin_menu():
@@ -17,7 +19,7 @@ def system_admin_menu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            break
+            own_profile_submenu()
         if choice == "2":
             service_engineer_submenu()
         if choice == "3":
