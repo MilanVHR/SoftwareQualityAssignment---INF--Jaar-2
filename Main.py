@@ -361,5 +361,4 @@ if __name__ == "__main__":
     db.SetupTraveller(cursor)
     db.SetupServiceEngineer(cursor)
     db.SetupSystemAdministrator(cursor)
-    db.SetupLog(cursor)
     login_menu()

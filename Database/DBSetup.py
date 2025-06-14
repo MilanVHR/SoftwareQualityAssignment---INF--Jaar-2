@@ -56,16 +56,3 @@ def SetupSystemAdministrator(cursor:Cursor):
             Registration_date DATE
         )
     ''')
-
-def SetupLog(cursor:Cursor):
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Logs (
-            Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            Date BLOB,                         
-            Time BLOB,                         
-            Username BLOB,                     
-            Description_of_activity BLOB,      
-            Additional_Information BLOB,       
-            Suspicious BOOLEAN
-        )
-    ''')
