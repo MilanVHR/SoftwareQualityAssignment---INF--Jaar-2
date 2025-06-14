@@ -29,7 +29,7 @@ def isPhoneNumberValid(phone):
         return False
 
 def isSerialNumberValid(serial):
-    pattern = r"^\d{8}$"
+    pattern = r"^[a-zA-z0-9]{10,17}$"
     if re.match(pattern, serial):
         return True
     else:
