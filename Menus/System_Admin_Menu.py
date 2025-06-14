@@ -1,4 +1,9 @@
-from Menus.Super_Admin_Menu import service_engineer_submenu, traveller_submenu
+
+
+
+
+
+from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
 
 
 def system_admin_menu():
@@ -14,7 +19,7 @@ def system_admin_menu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            break
+            own_profile_submenu()
         if choice == "2":
             service_engineer_submenu()
         if choice == "3":
@@ -29,28 +34,7 @@ def system_admin_menu():
             print("Je bent uitgelogd.")
             break
 
-def scooter_submenu():
-    while True:
-        print("\n--- Beheer Scooters ---")
-        print("1. Nieuwe scooter toevoegen")
-        print("2. Scootergegevens wijzigen")
-        print("3. Scooter verwijderen")
-        print("4. Scooter zoeken")
-        print("0. Terug naar hoofdmenu")
 
-        choice = input("Maak een keuze: ")
-        if choice == "1":
-            print("→  Toevoegen van een scooter") # (nog te implementeren)
-        elif choice == "2":
-            print("→  Wijzigen van een scooter") # (nog te implementeren)
-        elif choice == "3":
-            print("→  Verwijderen van een scooter") # (nog te implementeren)
-        elif choice == "4":
-            print("→  Zoekfunctie voor scooter") # (nog te implementeren)
-        elif choice == "0":
-            break
-        else:
-            print("Ongeldige keuze.")
 
 def backup_restore_submenu():
     while True:

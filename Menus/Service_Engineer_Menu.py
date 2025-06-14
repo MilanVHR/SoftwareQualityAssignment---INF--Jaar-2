@@ -1,7 +1,9 @@
-from Menus.Super_Admin_Menu import own_profile_submenu
+import sqlite3
+
+from Menus.Overlapping_Menu import own_profile_submenu
 
 
-def service_engineer_menu(current_user):
+def service_engineer_menu():
     while True:
         print("\n=== SERVICE ENGINEER MENU ===")
         print("1. Beheer eigen profiel")
@@ -12,9 +14,9 @@ def service_engineer_menu(current_user):
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            own_profile_submenu(current_user) # (nog te implementeren)
+            own_profile_submenu()  # (nog te implementeren)
         elif choice == "2":
-            update_scooter_attributes(current_user)
+            update_scooter_attributes()
         elif choice == "3":
             search_scooter()
         elif choice == "0":
@@ -22,6 +24,10 @@ def service_engineer_menu(current_user):
             break
         else:
             print("Ongeldige keuze. Probeer opnieuw.")
+
+
+
+
 
 def update_scooter_attributes(user):
     print("\n--- Scootergegevens bijwerken (alleen toegestane velden) ---")
@@ -38,24 +44,27 @@ def update_scooter_attributes(user):
     choice = input("Welke eigenschap wil je bijwerken? ")
 
     if choice == "1":
-        new_soc = input("Nieuwe SoC (%): ") # (nog te implementeren)
+        new_soc = input("Nieuwe SoC (%): ")  # (nog te implementeren)
         #  DB-update
         print(f"SoC bijgewerkt naar {new_soc}%")
     elif choice == "2":
-        lat = input("Nieuwe latitude (bijv. 51.9225): ") # (nog te implementeren)
+        # (nog te implementeren)
+        lat = input("Nieuwe latitude (bijv. 51.9225): ")
         lon = input("Nieuwe longitude (bijv. 4.47917): ")
         #  DB-update
         print(f"Locatie bijgewerkt naar lat={lat}, lon={lon}")
     elif choice == "3":
-        status = input("Is de scooter out-of-service? (ja/nee): ")# (nog te implementeren)
+        # (nog te implementeren)
+        status = input("Is de scooter out-of-service? (ja/nee): ")
         #  DB-update
         print(f"Out-of-service status ingesteld op {status}")
     elif choice == "4":
-        km = input("Nieuwe kilometerstand: ")# (nog te implementeren)
+        km = input("Nieuwe kilometerstand: ")  # (nog te implementeren)
         #  DB-update
         print(f"Kilometerstand bijgewerkt naar {km} km")
     elif choice == "5":
-        date = input("Nieuwe onderhoudsdatum (YYYY-MM-DD): ") # (nog te implementeren)
+        # (nog te implementeren)
+        date = input("Nieuwe onderhoudsdatum (YYYY-MM-DD): ")
         #  DB-update
         print(f"Laatste onderhoudsdatum bijgewerkt naar {date}")
     elif choice == "0":
@@ -63,5 +72,46 @@ def update_scooter_attributes(user):
     else:
         print("Ongeldige keuze.")
 
-def search_scooter(user):
-    return
+
+def search_scooter():
+    print("\n--- Scooter zoeken ---")
+    search_term = input(
+        "Voer een zoekterm in (ID, merk, model of serienummer): ")
+
+    conn = sqlite3.connect("urban_mobility.db")
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT id, Brand, Model, Serial_Number, Top_Speed, State_Of_Charge, Is_Out_Of_Service, Mileage
+        FROM scooters
+        WHERE
+            Brand LIKE ? OR
+            Model LIKE ? OR
+            Serial_Number LIKE ? OR
+            CAST(id AS TEXT) LIKE ?
+    ''', (
+        f"%{search_term}%",
+        f"%{search_term}%",
+        f"%{search_term}%",
+        f"%{search_term}%"
+    ))
+
+    results = cursor.fetchall()
+    conn.close()
+
+    if not results:
+        print("Geen scooters gevonden.")
+        return
+
+    print(f"\n{len(results)} scooter(s) gevonden:\n")
+    for scooter in results:
+        print(f"""
+Scooter ID: {scooter[0]}
+Merk & Model: {scooter[1]} {scooter[2]}
+Serienummer: {scooter[3]}
+Topsnelheid: {scooter[4]} km/u
+SoC: {scooter[5]}%
+Uit dienst: {'Ja' if scooter[6] else 'Nee'}
+Kilometerstand: {scooter[7]} km
+------------------------------
+        """)
