@@ -2,7 +2,7 @@ import sqlite3
 import pwinput
 
 
-def own_profile_submenu(current_user):
+def own_profile_submenu():
     while True:
         print("\n--- Beheer Eigen Profiel ---")
         print("1. Bekijk profiel")
@@ -14,13 +14,13 @@ def own_profile_submenu(current_user):
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            view_own_profile(current_user)
+            view_own_profile()
         elif choice == "2":
-            update_own_name(current_user)
+            update_own_name()
         elif choice == "3":
-            change_own_password(current_user)
+            change_own_password()
         elif choice == "4":
-            delete_own_account(current_user)
+            delete_own_account()
         elif choice == "0":
             break
 
