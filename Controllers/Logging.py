@@ -1,4 +1,4 @@
-import Controllers.Encryptions as Encryptions
+from Encryption.Encryptor import Decrypt, Encrypt
 import os
 from datetime import datetime
 
@@ -8,7 +8,7 @@ suspiciousFilePath = "./Logs/suspiciousLog.txt"
 
 def logString(message, critical = False):
     # Encrypt the message
-    encrypted_message = Encryptions.encrypt(message)
+    encrypted_message = Encrypt(message)
     
     # Write the encrypted message to the log file
     with open(logFilePath, "ab") as logFile:  # 'ab' mode to append in binary format
@@ -43,7 +43,7 @@ def readLog():
         lines = logFile.readlines()
         # loop through the lines to decrypt and add to list
         for line in lines:
-            decryptedLine = Encryptions.decrypt(line.strip())
+            decryptedLine = Decrypt(line.strip())
             decryptedLines.append(decryptedLine)
     # return decrypted list
     return decryptedLines
@@ -57,7 +57,7 @@ def readSuspiciousLog():
         lines = logFile.readlines()
         # loop through the lines to decrypt and add to list
         for line in lines:
-            decryptedLine = Encryptions.decrypt(line.strip())
+            decryptedLine = Decrypt(line.strip())
             decryptedLines.append(decryptedLine)
     # return decrypted list
     return decryptedLines
