@@ -1,5 +1,6 @@
 
 
+from Controllers.Logging import log
 
 
 
@@ -94,7 +95,7 @@ def add_system_admin():
     password = input("Wachtwoord: ")
     first_name = input("Voornaam: ")
     last_name = input("Achternaam: ")
-
+    log("New admin user is created", "super_admin", f"username: {username}")
     # validatie + encryptie + toevoegen aan database
     print(f"Nieuwe system admin '{username}' voorbereid voor toevoegen.") # (nog te implementeren)
 
@@ -104,6 +105,7 @@ def delete_system_admin():
     confirm = input(f"Weet je zeker dat je '{username}' wilt verwijderen? (ja/nee): ")
     
     if confirm.lower() == "ja":
+        log("New admin user is deleted", "super_admin", f"username: {username}")
         #  uit database verwijderen
         print(f"🗑️ '{username}' gemarkeerd voor verwijdering.") # (nog te implementeren)
     else:
@@ -118,6 +120,7 @@ def update_system_admin():
     print("3. Rol wijzigen (meestal niet nodig)")
     choice = input("Wat wil je wijzigen? ")
 
+    log("System admin has been updated", "super_admin", f"username: {username}")
     #  gegevens ophalen, wijzigen in de database
     print(f"Wijziging voor '{username}' voorbereid.") # (nog te implementeren)
 
@@ -125,6 +128,8 @@ def reset_system_admin_password():
     print("\n--- Reset wachtwoord System Admin ---")
     username = input("Gebruikersnaam van de admin: ")
     temp_password = "TempPass123!"  # Is nu hardcoded, kan willekeurig worden nog
-    
+
+    log("System admin password has been reset", "super_admin", f"username: {username}")
+
     #  password reset logica + e-mail of melding
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.") # (nog te implementeren)

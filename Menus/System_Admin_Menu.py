@@ -1,5 +1,6 @@
 from datetime import datetime
 from Controllers.Validations import isSerialNumberValid
+from Controllers.Logging import log
 from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
 from Model.Scooter import addScooterToDatabase, Scooter
 
@@ -65,10 +66,13 @@ def backup_restore_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
+            log("back up created", "system_admin")
             print("→  Backup maken") # (nog te implementeren)
         elif choice == "2":
+            log("restore code generated", "system_admin")
             print("→  Restore-code genereren") # (nog te implementeren)
         elif choice == "3":
+            log("restore code deleted", "system_admin")
             print("→  Restore-code intrekken") # (nog te implementeren)
         elif choice == "0":
             break
@@ -156,4 +160,5 @@ def add_scooter_menu(connection):
 
     toAdd = Scooter(serial_number, brand, model, top_speed, battery_capacity, state_of_charge, target_range_soc, location, is_out_of_service, mileage, last_maintenance_date)
     addScooterToDatabase(connection, toAdd)
+    log("added new scooter", "system_admin", f"serial number: {serial_number}")
 
