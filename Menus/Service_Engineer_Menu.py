@@ -21,7 +21,7 @@ def service_engineer_menu():
         elif choice == "3":
             search_scooter()
         elif choice == "0":
-            print("Je bent uitgelogd.")
+            print("Je bent uitgelogd.\n")
             break
         else:
             print("Ongeldige keuze. Probeer opnieuw.")

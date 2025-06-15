@@ -1,3 +1,4 @@
+import os
 from Encryption.Encryptor import Decrypt, Encrypt
 from datetime import datetime, timezone
 
@@ -6,6 +7,7 @@ logFilePath = "./Logs/log.txt"
 suspiciousFilePath = "./Logs/suspiciousLog.txt"
 
 def logString(message, critical = False):
+    os.makedirs("Logs", exist_ok=True)
     # Encrypt the message
     encrypted_message = Encrypt(message)
     
