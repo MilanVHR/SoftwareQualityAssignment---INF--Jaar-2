@@ -160,4 +160,5 @@ def add_scooter_menu(connection):
 
     toAdd = Scooter(serial_number, brand, model, top_speed, battery_capacity, state_of_charge, target_range_soc, location, is_out_of_service, mileage, last_maintenance_date)
     addScooterToDatabase(connection, toAdd)
+    log("added new scooter", "system_admin", f"serial number: {serial_number}")
 
