@@ -30,7 +30,7 @@ def system_admin_menu():
         if choice == "6":
             print("→ Logs bekijken (nog te implementeren)")
         if choice == "0":
-            print("Je bent uitgelogd.")
+            print("Je bent uitgelogd.\n")
             break
 
 def scooter_submenu():
