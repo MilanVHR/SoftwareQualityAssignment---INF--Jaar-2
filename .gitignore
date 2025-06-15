@@ -1,2 +1,3 @@
 *\__pycache__
-Encryption/encryption_key.txt
+Encryption/encryption_key.bin
+Logs/log.txt
