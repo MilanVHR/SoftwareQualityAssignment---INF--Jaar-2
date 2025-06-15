@@ -33,7 +33,7 @@ def super_admin_menu():
         elif choice == "6":
             print("→ Logs bekijken (nog te implementeren)")
         elif choice == "0":
-            print("Je bent uitgelogd.")
+            print("Je bent uitgelogd.\n")
             break
         else:
             print("Ongeldige keuze. Probeer opnieuw.")
