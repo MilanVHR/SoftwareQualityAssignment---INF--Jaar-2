@@ -29,10 +29,10 @@ def login_menu():
         if username == "super_admin" and password == "Admin_123?":
             log("logged in", username)
             super_admin_menu()
-        elif username == "system_admin" and password == "System_123?":
+        elif role == Roles.System_Admin :
             log("logged in", username)
             system_admin_menu() #TIJDELIJK
-        elif username == "service_engineer" and password == "Service_123?":
+        elif role == Roles.Service_Engineer:
             log("logged in", username)
             service_engineer_menu() #TIJDELIJK
         else:
