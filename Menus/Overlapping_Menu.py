@@ -1,5 +1,4 @@
 import sqlite3
-import pwinput
 
 
 def own_profile_submenu():
@@ -36,13 +35,13 @@ def service_engineer_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            print("→ Toevoegen van een Service Engineer") # (nog te implementeren) 
+            print("→ Toevoegen van een Service Engineer")  # (nog te implementeren)
         elif choice == "2":
-            print("→  Wijzigen van een Service Engineer") # (nog te implementeren)
+            print("→  Wijzigen van een Service Engineer")  # (nog te implementeren)
         elif choice == "3":
-            print("→  Verwijderen van een Service Engineer") # (nog te implementeren)
+            print("→  Verwijderen van een Service Engineer")  # (nog te implementeren)
         elif choice == "4":
-            print("→  Reset wachtwoord voor een Service Engineer") # (nog te implementeren)
+            print("→  Reset wachtwoord voor een Service Engineer")  # (nog te implementeren)
         elif choice == "0":
             break
         else:
@@ -60,13 +59,13 @@ def traveller_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            print("→  Toevoegen van een Traveller") # (nog te implementeren)
+            print("→  Toevoegen van een Traveller")  # (nog te implementeren)
         elif choice == "2":
-            print("→  Wijzigen van een Traveller") # (nog te implementeren)
+            print("→  Wijzigen van een Traveller")  # (nog te implementeren)
         elif choice == "3":
-            print("→  Verwijderen van een Traveller") # (nog te implementeren)
+            print("→  Verwijderen van een Traveller")  # (nog te implementeren)
         elif choice == "4":
-            print("→  Zoekfunctie voor Traveller") # (nog te implementeren)
+            print("→  Zoekfunctie voor Traveller")  # (nog te implementeren)
         elif choice == "0":
             break
         else:
@@ -84,13 +83,13 @@ def scooter_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            print("→  Toevoegen van een scooter") # (nog te implementeren)
+            print("→  Toevoegen van een scooter")  # (nog te implementeren)
         elif choice == "2":
-            print("→  Wijzigen van een scooter") # (nog te implementeren)
+            print("→  Wijzigen van een scooter")  # (nog te implementeren)
         elif choice == "3":
-            print("→  Verwijderen van een scooter") # (nog te implementeren)
+            print("→  Verwijderen van een scooter")  # (nog te implementeren)
         elif choice == "4":
-            print("→  Zoekfunctie voor scooter") # (nog te implementeren)
+            print("→  Zoekfunctie voor scooter")  # (nog te implementeren)
         elif choice == "0":
             break
         else:
@@ -100,7 +99,8 @@ def scooter_submenu():
 def view_own_profile(user):
     conn = sqlite3.connect("urban_mobility.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT first_name, last_name, registration_date FROM users WHERE LOWER(username)=?", (user["username"].lower(),))
+    cursor.execute("SELECT first_name, last_name, registration_date FROM users WHERE LOWER(username)=?",
+                   (user["username"].lower(),))
     result = cursor.fetchone()
     conn.close()
 
@@ -128,7 +128,6 @@ def update_own_name(user):
     conn.commit()
     conn.close()
     print("Naam bijgewerkt.")
-
 
 
 def change_own_password(user):

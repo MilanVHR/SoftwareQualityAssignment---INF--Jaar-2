@@ -2,7 +2,7 @@ from datetime import date
 import sqlite3
 from Database.DBCheckUser import Roles, check_role
 import Database.DBSetup as db
-import pwinput
+import getpass
 import sys
 import time
 from Controllers.Logging import log
@@ -10,10 +10,6 @@ from Controllers.Logging import log
 from Menus.Service_Engineer_Menu import service_engineer_menu
 from Menus.Super_Admin_Menu import super_admin_menu
 from Menus.System_Admin_Menu import system_admin_menu
-from Model.Service_Engineer import Service_Engineer, addServiceEngineerToDatabase
-from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
-
-
 
 
 def login_menu(connection):
@@ -22,9 +18,8 @@ def login_menu(connection):
         print("=== URBAN MOBILITY BACKEND SYSTEM ===")
         print("Log in als een gebruiker\n")
 
-    
         username = input("Gebruikersnaam: ")
-        password = pwinput.pwinput(prompt='Wachtwoord: ', mask='*')
+        password = getpass.getpass("Wachtwoord: ")
 
         role = check_role(cursor, username, password)
 
@@ -32,7 +27,7 @@ def login_menu(connection):
         if username == "super_admin" and password == "Admin_123?":
             log("logged in", username)
             super_admin_menu()
-        elif role == Roles.System_Admin :
+        elif role == Roles.System_Admin:
             log("logged in", username)
             system_admin_menu(connection) #TIJDELIJK
         elif role == Roles.Service_Engineer:
@@ -42,14 +37,19 @@ def login_menu(connection):
             # Checken in de databasse
             attempts += 1
             if (attempts == 3):
-                log("Too many login attempts", additional=f"username: \"{username}\" is used for a login attempt with a wrong password", critical=True)
+                log("Too many login attempts",
+                    additional=f"username: \"{username}\" is used for a login attempt with a wrong password",
+                    critical=True)
                 print("Teveel inlog pogingen.")
                 login_timeout()
                 attempts = 0
             else:
-                log("Unsuccessful login", additional=f"username: \"{username}\" is used for a login attempt with a wrong password", critical=True)
+                log("Unsuccessful login",
+                    additional=f"username: \"{username}\" is used for a login attempt with a wrong password",
+                    critical=True)
                 print("Onjuiste inloggegevens of nog niet geïmplementeerd.")
             # system_admin_menu() en service_engineer_menu() aanroepen
+
 
 def login_timeout():
     # time out is 5 minutes
@@ -65,6 +65,7 @@ def login_timeout():
     # if user tries to escape timeout reset it
     except KeyboardInterrupt:
         login_timeout()
+
 
 if __name__ == "__main__":
     connection = sqlite3.connect('SQAssignmentDB.db')
