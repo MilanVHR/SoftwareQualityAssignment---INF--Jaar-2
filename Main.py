@@ -10,6 +10,8 @@ from Controllers.Logging import log
 from Menus.Service_Engineer_Menu import service_engineer_menu
 from Menus.Super_Admin_Menu import super_admin_menu
 from Menus.System_Admin_Menu import system_admin_menu
+from Model.Service_Engineer import Service_Engineer, addServiceEngineerToDatabase
+from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
 
 
 def login_menu(connection):
@@ -74,4 +76,8 @@ if __name__ == "__main__":
     db.SetupTraveller(cursor)
     db.SetupServiceEngineer(cursor)
     db.SetupSystemAdministrator(cursor)
+    # se = Service_Engineer(Username="Milan", Password="Uilskuiken69", First_Name="Milan", Last_Name="Versluis", Registration_date= date(2020, 12, 24))
+    # sa = System_Administrator(Username="Esmée", Password="Uilskuiken69", First_Name="Esmée", Last_Name="Biersteker", Registration_date= date(2020, 12, 24))
+    # addServiceEngineerToDatabase(connection, se)
+    # addSystemAdministratorToDatabase(connection, se)
     login_menu(connection)
