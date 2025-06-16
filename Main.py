@@ -1,3 +1,4 @@
+from datetime import date
 import sqlite3
 from Database.DBCheckUser import Roles, check_role
 import Database.DBSetup as db
@@ -9,11 +10,13 @@ from Controllers.Logging import log
 from Menus.Service_Engineer_Menu import service_engineer_menu
 from Menus.Super_Admin_Menu import super_admin_menu
 from Menus.System_Admin_Menu import system_admin_menu
+from Model.Service_Engineer import Service_Engineer, addServiceEngineerToDatabase
+from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
 
 
 
 
-def login_menu():
+def login_menu(connection):
     attempts = 0
     while True:
         print("=== URBAN MOBILITY BACKEND SYSTEM ===")
@@ -31,10 +34,10 @@ def login_menu():
             super_admin_menu()
         elif role == Roles.System_Admin :
             log("logged in", username)
-            system_admin_menu() #TIJDELIJK
+            system_admin_menu(connection) #TIJDELIJK
         elif role == Roles.Service_Engineer:
             log("logged in", username)
-            service_engineer_menu() #TIJDELIJK
+            service_engineer_menu(username) #TIJDELIJK
         else:
             # Checken in de databasse
             attempts += 1
@@ -70,4 +73,4 @@ if __name__ == "__main__":
     db.SetupTraveller(cursor)
     db.SetupServiceEngineer(cursor)
     db.SetupSystemAdministrator(cursor)
-    login_menu()
+    login_menu(connection)

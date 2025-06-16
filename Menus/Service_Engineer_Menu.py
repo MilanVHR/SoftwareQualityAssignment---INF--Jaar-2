@@ -4,7 +4,7 @@ from Controllers.Logging import log
 from Menus.Overlapping_Menu import own_profile_submenu
 
 
-def service_engineer_menu():
+def service_engineer_menu(username):
     while True:
         print("\n=== SERVICE ENGINEER MENU ===")
         print("1. Beheer eigen profiel")
@@ -17,7 +17,7 @@ def service_engineer_menu():
         if choice == "1":
             own_profile_submenu()  # (nog te implementeren)
         elif choice == "2":
-            update_scooter_attributes()
+            update_scooter_attributes(username)
         elif choice == "3":
             search_scooter()
         elif choice == "0":
@@ -28,7 +28,7 @@ def service_engineer_menu():
 
 
 
-def update_scooter_attributes():
+def update_scooter_attributes(username):
     print("\n--- Scootergegevens bijwerken (alleen toegestane velden) ---")
     scooter_id = input("Voer het ID of serienummer van de scooter in: ")
 
@@ -45,7 +45,7 @@ def update_scooter_attributes():
     if choice == "1":
         new_soc = input("Nieuwe SoC (%): ")  # (nog te implementeren)
 
-        log("Scooter: State of Charge updated", str(user), f"scooter_id: {scooter_id}, new SoC: {new_soc}")
+        log("Scooter: State of Charge updated", username, f"scooter_id: {scooter_id}, new SoC: {new_soc}")
 
         #  DB-update
         print(f"SoC bijgewerkt naar {new_soc}%")
@@ -54,7 +54,7 @@ def update_scooter_attributes():
         lat = input("Nieuwe latitude (bijv. 51.9225): ")
         lon = input("Nieuwe longitude (bijv. 4.47917): ")
 
-        log("Scooter: location updated", str(user), f"scooter_id: {scooter_id}, new latitude: {lat}, new longitude: {lon}")
+        log("Scooter: location updated", username, f"scooter_id: {scooter_id}, new latitude: {lat}, new longitude: {lon}")
 
         #  DB-update
         print(f"Locatie bijgewerkt naar lat={lat}, lon={lon}")
@@ -62,14 +62,14 @@ def update_scooter_attributes():
         # (nog te implementeren)
         status = input("Is de scooter out-of-service? (ja/nee): ")
 
-        log("Scooter: status updated", str(user), f"scooter_id: {scooter_id}, is the scooter out of service: {status}")
+        log("Scooter: status updated", username, f"scooter_id: {scooter_id}, is the scooter out of service: {status}")
 
         #  DB-update
         print(f"Out-of-service status ingesteld op {status}")
     elif choice == "4":
         km = input("Nieuwe kilometerstand: ")  # (nog te implementeren)
 
-        log("Scooter: kilometers updated", str(user), f"scooter_id: {scooter_id}, new km: {km}")
+        log("Scooter: kilometers updated", username, f"scooter_id: {scooter_id}, new km: {km}")
 
         #  DB-update
         print(f"Kilometerstand bijgewerkt naar {km} km")
@@ -77,7 +77,7 @@ def update_scooter_attributes():
         # (nog te implementeren)
         date = input("Nieuwe onderhoudsdatum (YYYY-MM-DD): ")
 
-        log("Scooter: service date updated", str(user), f"scooter_id: {scooter_id}, new date: {date}")
+        log("Scooter: service date updated", username, f"scooter_id: {scooter_id}, new date: {date}")
 
         #  DB-update
         print(f"Laatste onderhoudsdatum bijgewerkt naar {date}")

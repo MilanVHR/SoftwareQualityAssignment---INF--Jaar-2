@@ -5,7 +5,7 @@ from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service
 from Model.Scooter import addScooterToDatabase, Scooter
 
 
-def system_admin_menu():
+def system_admin_menu(connection):
     while True:
         print("\n=== SYSTEM ADMIN MENU ===")
         print("1. Beheer eigen profiel")
@@ -24,7 +24,7 @@ def system_admin_menu():
         if choice == "3":
             traveller_submenu()
         if choice == "4":
-            scooter_submenu()
+            scooter_submenu(connection)
         if choice == "5":
             backup_restore_submenu()
         if choice == "6":
@@ -33,7 +33,7 @@ def system_admin_menu():
             print("Je bent uitgelogd.\n")
             break
 
-def scooter_submenu():
+def scooter_submenu(connection):
     while True:
         print("\n--- Beheer Scooters ---")
         print("1. Nieuwe scooter toevoegen")
@@ -44,7 +44,7 @@ def scooter_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            add_scooter_menu()
+            add_scooter_menu(connection)
         elif choice == "2":
             print("→  Wijzigen van een scooter") # (nog te implementeren)
         elif choice == "3":
