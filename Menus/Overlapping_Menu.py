@@ -1,4 +1,5 @@
 import sqlite3
+from Controllers.Logging import readLog, readSuspiciousLog
 
 
 def own_profile_submenu():
@@ -146,3 +147,47 @@ def delete_own_account(user):
         exit()  # Verlaat de applicatie na verwijderen
     else:
         print("Verwijdering geannuleerd.")
+
+
+def show_logs():
+    while True:
+        print("\n--- Reguliere logs ---")
+        logs = readLog()
+
+        for log in logs:
+            print(log)
+
+        print("0. Terug naar menu")
+        choice = input("Maak een keuze: ")
+        if choice == "0":
+            break
+
+
+def show_suspicious_logs():
+    while True:
+        print("\n--- Verdachte logs ---")
+        logs = readSuspiciousLog()
+
+        for log in logs:
+            print(log)
+
+        print("0. Terug naar menu")
+        choice = input("Maak een keuze: ")
+        if choice == "0":
+            break
+
+
+def show_logs_menu():
+    while True:
+        print("\n--- Bekijk logs ---")
+        print("1. Bekijk de reguliere logs")
+        print("2. Bekijk de verdachte logs")
+        print("0. Terug naar hoofdmenu")
+
+        choice = input("Maak een keuze: ")
+        if choice == "1":
+            show_logs()
+        elif choice == "2":
+            show_suspicious_logs()
+        elif choice == "0":
+            break
