@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt
@@ -20,9 +21,9 @@ def own_profile_submenu(connection, username, role):
         elif choice == "2":
             update_own_name(connection, username, role)
         elif choice == "3":
-            change_own_password()
+            change_own_password(connection, username, role)
         elif choice == "4":
-            delete_own_account()
+            delete_own_account(connection, username, role)
         elif choice == "0":
             break
 
@@ -145,21 +146,27 @@ def update_own_name(connection, username, role):
     print("Naam bijgewerkt.")
 
 
-def change_own_password(user):
+def change_own_password(connection, username, role):
     return
 
 
-def delete_own_account(user):
+def delete_own_account(connection, username, role):
     confirm = input(
-        f"Weet je zeker dat je jouw account '{user['username']}' wilt verwijderen? (ja/nee): ")
+        f"Weet je zeker dat je jouw account '{username}' wilt verwijderen? (ja/nee): ")
     if confirm.lower() == "ja":
-        conn = sqlite3.connect("urban_mobility.db")
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE LOWER(username)=?",
-                       (user["username"].lower(),))
-        conn.commit()
-        conn.close()
+        cursor = connection.cursor()
+
+        if role == Roles.Service_Engineer:
+            cursor.execute("DELETE FROM Service_Engineers WHERE username=?",
+                           (Encrypt(username),))
+        else:
+            cursor.execute("DELETE FROM System_Administrators WHERE username=?",
+                           (Encrypt(username),))
+
+        connection.commit()
+
         print(" Account verwijderd. Je bent nu uitgelogd.")
+        time.sleep(3)
         exit()  # Verlaat de applicatie na verwijderen
     else:
         print("Verwijdering geannuleerd.")
