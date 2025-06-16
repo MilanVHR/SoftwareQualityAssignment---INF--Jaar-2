@@ -39,16 +39,14 @@ def login_menu(connection):
             # Checken in de databasse
             attempts += 1
             if (attempts == 3):
-                log("Too many login attempts",
-                    additional=f"username: \"{username}\" is used for a login attempt with a wrong password",
-                    critical=True)
+                log("Too many login attempts", "",
+                    f"username: {username} is used for a login attempt with a wrong password", True)
                 print("Teveel inlog pogingen.")
                 login_timeout()
                 attempts = 0
             else:
-                log("Unsuccessful login",
-                    additional=f"username: \"{username}\" is used for a login attempt with a wrong password",
-                    critical=True)
+                log("Unsuccessful login", "",
+                    f"username: {username} is used for a login attempt with a wrong password", True)
                 print("Onjuiste inloggegevens of nog niet geïmplementeerd.")
             # system_admin_menu() en service_engineer_menu() aanroepen
 

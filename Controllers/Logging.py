@@ -1,16 +1,19 @@
 import os
 from Encryption.Encryptor import Decrypt, Encrypt
 from datetime import datetime, timezone
+from cryptography.exceptions import InvalidTag
 
 
 logFilePath = "./Logs/log.txt"
 suspiciousFilePath = "./Logs/suspiciousLog.txt"
 
-def logString(message, critical = False):
+
+def logString(message, critical=False):
+    print(message)
     os.makedirs("Logs", exist_ok=True)
     # Encrypt the message
     encrypted_message = Encrypt(message)
-    
+
     # Write the encrypted message to the log file
     with open(logFilePath, "ab") as logFile:  # 'ab' mode to append in binary format
         logFile.write(encrypted_message + b"\n")
@@ -18,7 +21,8 @@ def logString(message, critical = False):
         with open(suspiciousFilePath, "ab") as logFile:  # 'ab' mode to append in binary format
             logFile.write(encrypted_message + b"\n")
 
-def log(description:str, Username:str = "", additional:str = "", critical:bool = False ):
+
+def log(description: str, Username: str = "", additional: str = "", critical: bool = False):
     # Get the current date and time
     current_datetime = datetime.now(timezone.utc)
 
@@ -26,9 +30,9 @@ def log(description:str, Username:str = "", additional:str = "", critical:bool =
     current_date = current_datetime.date()
     current_time = current_datetime.time()
 
-    suspicious = "Yes" if critical else "no"
+    suspicious = "Yes" if critical == True else "no"
 
-    logString(f"{current_date}, {current_time}, {Username}, {description}, {additional}, {suspicious}")
+    logString(f"{current_date}, {current_time}, {Username}, {description}, {additional}, {suspicious}", critical)
 
 
 def readLog():
@@ -40,10 +44,14 @@ def readLog():
         lines = logFile.readlines()
         # loop through the lines to decrypt and add to list
         for line in lines:
-            decryptedLine = Decrypt(line.strip())
+            try:
+                decryptedLine = Decrypt(line.rstrip(b"\n"))
+            except InvalidTag:
+                decryptedLine = "corrupted log"
             decryptedLines.append(decryptedLine)
     # return decrypted list
     return decryptedLines
+
 
 def readSuspiciousLog():
     # create empty list
@@ -54,7 +62,10 @@ def readSuspiciousLog():
         lines = logFile.readlines()
         # loop through the lines to decrypt and add to list
         for line in lines:
-            decryptedLine = Decrypt(line.strip())
+            try:
+                decryptedLine = Decrypt(line.rstrip(b"\n"))
+            except InvalidTag:
+                decryptedLine = "corrupted log"
             decryptedLines.append(decryptedLine)
     # return decrypted list
     return decryptedLines

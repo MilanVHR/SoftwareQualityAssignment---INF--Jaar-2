@@ -2,7 +2,7 @@ from datetime import datetime
 from Controllers.Validations import isSerialNumberValid
 from Controllers.Logging import log
 from Database.DBCheckUser import Roles
-from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
+from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
 from Model.Scooter import addScooterToDatabase, Scooter
 
 
@@ -29,10 +29,11 @@ def system_admin_menu(connection, username):
         if choice == "5":
             backup_restore_submenu()
         if choice == "6":
-            print("→ Logs bekijken (nog te implementeren)")
+            show_logs_menu()
         if choice == "0":
             print("Je bent uitgelogd.\n")
             break
+
 
 def scooter_submenu(connection):
     while True:
@@ -47,15 +48,16 @@ def scooter_submenu(connection):
         if choice == "1":
             add_scooter_menu(connection)
         elif choice == "2":
-            print("→  Wijzigen van een scooter") # (nog te implementeren)
+            print("→  Wijzigen van een scooter")  # (nog te implementeren)
         elif choice == "3":
-            print("→  Verwijderen van een scooter") # (nog te implementeren)
+            print("→  Verwijderen van een scooter")  # (nog te implementeren)
         elif choice == "4":
-            print("→  Zoekfunctie voor scooter") # (nog te implementeren)
+            print("→  Zoekfunctie voor scooter")  # (nog te implementeren)
         elif choice == "0":
             break
         else:
             print("Ongeldige keuze.")
+
 
 def backup_restore_submenu():
     while True:
@@ -68,17 +70,18 @@ def backup_restore_submenu():
         choice = input("Maak een keuze: ")
         if choice == "1":
             log("back up created", "system_admin")
-            print("→  Backup maken") # (nog te implementeren)
+            print("→  Backup maken")  # (nog te implementeren)
         elif choice == "2":
             log("restore code generated", "system_admin")
-            print("→  Restore-code genereren") # (nog te implementeren)
+            print("→  Restore-code genereren")  # (nog te implementeren)
         elif choice == "3":
             log("restore code deleted", "system_admin")
-            print("→  Restore-code intrekken") # (nog te implementeren)
+            print("→  Restore-code intrekken")  # (nog te implementeren)
         elif choice == "0":
             break
         else:
             print("Ongeldige keuze.")
+
 
 def add_scooter_menu(connection):
     brand = input("Voer de brand van de scooter in:")
@@ -90,7 +93,7 @@ def add_scooter_menu(connection):
             print("Serial number is te lang of te kort")
         if not serial_number.isalnum():
             print("Serial number bevat niet toegestaande karakters")
-    
+
     top_speed_input = ""
     while not top_speed_input.isnumeric() or int(top_speed_input) < 0:
         top_speed_input = input("Voer de top speed van de scooter in, alleen nummer en grooter dan 0: ")
@@ -99,7 +102,7 @@ def add_scooter_menu(connection):
         if top_speed_input.isnumeric() and int(top_speed_input) < 0:
             print("Top speed moet grooter dan")
     top_speed = int(top_speed_input)
-    
+
     battery_capacity_input = ""
     while not battery_capacity_input.isnumeric() or int(battery_capacity_input) < 0:
         battery_capacity_input = input("Voer de batterijcapaciteit de scooter in, alleen nummer en grooter dan 0: ")
@@ -159,7 +162,17 @@ def add_scooter_menu(connection):
         except ValueError:
             print("Ongeldige datum, probeer opnieuw.")
 
-    toAdd = Scooter(serial_number, brand, model, top_speed, battery_capacity, state_of_charge, target_range_soc, location, is_out_of_service, mileage, last_maintenance_date)
+    toAdd = Scooter(
+        serial_number,
+        brand,
+        model,
+        top_speed,
+        battery_capacity,
+        state_of_charge,
+        target_range_soc,
+        location,
+        is_out_of_service,
+        mileage,
+        last_maintenance_date)
     addScooterToDatabase(connection, toAdd)
     log("added new scooter", "system_admin", f"serial number: {serial_number}")
-
