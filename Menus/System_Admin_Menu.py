@@ -1,11 +1,12 @@
 from datetime import datetime
 from Controllers.Validations import isSerialNumberValid
 from Controllers.Logging import log
+from Database.DBCheckUser import Roles
 from Menus.Overlapping_Menu import own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu
 from Model.Scooter import addScooterToDatabase, Scooter
 
 
-def system_admin_menu(connection):
+def system_admin_menu(connection, username):
     while True:
         print("\n=== SYSTEM ADMIN MENU ===")
         print("1. Beheer eigen profiel")
@@ -18,7 +19,7 @@ def system_admin_menu(connection):
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            own_profile_submenu()
+            own_profile_submenu(connection, username, Roles.System_Admin)
         if choice == "2":
             service_engineer_submenu()
         if choice == "3":

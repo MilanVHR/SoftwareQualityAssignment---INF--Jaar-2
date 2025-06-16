@@ -1,10 +1,11 @@
 import sqlite3
 
 from Controllers.Logging import log
+from Database.DBCheckUser import Roles
 from Menus.Overlapping_Menu import own_profile_submenu
 
 
-def service_engineer_menu(username):
+def service_engineer_menu(connection, username):
     while True:
         print("\n=== SERVICE ENGINEER MENU ===")
         print("1. Beheer eigen profiel")
@@ -15,7 +16,7 @@ def service_engineer_menu(username):
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            own_profile_submenu()  # (nog te implementeren)
+            own_profile_submenu(connection, username, Roles.Service_Engineer)  # (nog te implementeren)
         elif choice == "2":
             update_scooter_attributes(username)
         elif choice == "3":
