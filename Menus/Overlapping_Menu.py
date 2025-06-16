@@ -1,8 +1,11 @@
 import sqlite3
 from Controllers.Logging import readLog, readSuspiciousLog
 
+from Database.DBCheckUser import Roles
+from Encryption.Encryptor import Decrypt, Encrypt
 
-def own_profile_submenu():
+
+def own_profile_submenu(connection, username, role):
     while True:
         print("\n--- Beheer Eigen Profiel ---")
         print("1. Bekijk profiel")
@@ -14,9 +17,9 @@ def own_profile_submenu():
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            view_own_profile()
+            view_own_profile(connection.cursor(), username, role)
         elif choice == "2":
-            update_own_name()
+            update_own_name(connection, username, role)
         elif choice == "3":
             change_own_password()
         elif choice == "4":
@@ -36,13 +39,17 @@ def service_engineer_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            print("→ Toevoegen van een Service Engineer")  # (nog te implementeren)
+            # (nog te implementeren)
+            print("→ Toevoegen van een Service Engineer")
         elif choice == "2":
-            print("→  Wijzigen van een Service Engineer")  # (nog te implementeren)
+            # (nog te implementeren)
+            print("→  Wijzigen van een Service Engineer")
         elif choice == "3":
-            print("→  Verwijderen van een Service Engineer")  # (nog te implementeren)
+            # (nog te implementeren)
+            print("→  Verwijderen van een Service Engineer")
         elif choice == "4":
-            print("→  Reset wachtwoord voor een Service Engineer")  # (nog te implementeren)
+            # (nog te implementeren)
+            print("→  Reset wachtwoord voor een Service Engineer")
         elif choice == "0":
             break
         else:
@@ -97,37 +104,45 @@ def scooter_submenu():
             print("Ongeldige keuze.")
 
 
-def view_own_profile(user):
-    conn = sqlite3.connect("urban_mobility.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT first_name, last_name, registration_date FROM users WHERE LOWER(username)=?",
-                   (user["username"].lower(),))
+def view_own_profile(cursor, username, role):
+    if role == Roles.Service_Engineer:
+        cursor.execute("SELECT * FROM Service_Engineers WHERE username=?",
+                       (Encrypt(username),))
+    else:
+        cursor.execute("SELECT * FROM System_Administrators WHERE username=?",
+                       (Encrypt(username),))
     result = cursor.fetchone()
-    conn.close()
 
     if result:
         print("\n👤 Profielgegevens:")
-        print(f"Voornaam: {result[0]}")
-        print(f"Achternaam: {result[1]}")
-        print(f"Geregistreerd op: {result[2]}")
+        print(f"Voornaam: {Decrypt(result[2])}")
+        print(f"Achternaam: {Decrypt(result[3])}")
+        print(f"Geregistreerd op: {result[4]}")
     else:
         print("Profiel niet gevonden.")
 
 
-def update_own_name(user):
+def update_own_name(connection, username, role):
     first = input("Nieuwe voornaam (Enter om te behouden): ")
     last = input("Nieuwe achternaam (Enter om te behouden): ")
+    cursor = connection.cursor()
 
-    conn = sqlite3.connect("urban_mobility.db")
-    cursor = conn.cursor()
+    if role == Roles.Service_Engineer:
+        if first:
+            cursor.execute("UPDATE Service_Engineers SET First_Name=? WHERE Username=?",
+                           (Encrypt(first), Encrypt(username)))
+        if last:
+            cursor.execute("UPDATE Service_Engineers SET Last_Name=? WHERE Username=?",
+                           (Encrypt(last), Encrypt(username)))
+    else:
+        if first:
+            cursor.execute("UPDATE System_Administrators SET First_Name=? WHERE Username=?",
+                           (Encrypt(first), Encrypt(username)))
+        if last:
+            cursor.execute("UPDATE System_Administrators SET Last_Name=? WHERE Username=?",
+                           (Encrypt(last), Encrypt(username)))
 
-    if first:
-        cursor.execute("UPDATE users SET first_name=? WHERE LOWER(username)=?", (first, user["username"].lower()))
-    if last:
-        cursor.execute("UPDATE users SET last_name=? WHERE LOWER(username)=?", (last, user["username"].lower()))
-
-    conn.commit()
-    conn.close()
+    connection.commit()
     print("Naam bijgewerkt.")
 
 
@@ -136,11 +151,13 @@ def change_own_password(user):
 
 
 def delete_own_account(user):
-    confirm = input(f"Weet je zeker dat je jouw account '{user['username']}' wilt verwijderen? (ja/nee): ")
+    confirm = input(
+        f"Weet je zeker dat je jouw account '{user['username']}' wilt verwijderen? (ja/nee): ")
     if confirm.lower() == "ja":
         conn = sqlite3.connect("urban_mobility.db")
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE LOWER(username)=?", (user["username"].lower(),))
+        cursor.execute("DELETE FROM users WHERE LOWER(username)=?",
+                       (user["username"].lower(),))
         conn.commit()
         conn.close()
         print(" Account verwijderd. Je bent nu uitgelogd.")

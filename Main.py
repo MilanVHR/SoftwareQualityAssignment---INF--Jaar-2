@@ -29,7 +29,7 @@ def login_menu(connection):
             super_admin_menu()
         elif role == Roles.System_Admin:
             log("logged in", username)
-            system_admin_menu(connection)  # TIJDELIJK
+            system_admin_menu(connection, username)  # TIJDELIJK
         elif role == Roles.Service_Engineer:
             log("logged in", username)
             service_engineer_menu(username)  # TIJDELIJK
