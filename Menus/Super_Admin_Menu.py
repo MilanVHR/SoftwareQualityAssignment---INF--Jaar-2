@@ -7,7 +7,7 @@ from Controllers.Logging import log
 from Controllers.Validations import isPasswordValid, isUsernameValid
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
 from Menus.System_Admin_Menu import backup_restore_submenu
-from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
+from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase
 
 
 def super_admin_menu(connection):
@@ -57,7 +57,7 @@ def system_admin_submenu(connection):
         elif choice == "2":
             update_system_admin()
         elif choice == "3":
-            delete_system_admin()
+            delete_system_admin(connection)
         elif choice == "4":
             reset_system_admin_password()
         elif choice == "0":
@@ -92,14 +92,15 @@ def add_system_admin(connection):
     addSystemAdministratorToDatabase(connection, toAdd)
 
 
-def delete_system_admin():
+def delete_system_admin(connection):
     print("\n--- Verwijder System Administrator ---")
     username = input("Gebruikersnaam van de admin die je wilt verwijderen: ")
     confirm = input(f"Weet je zeker dat je '{username}' wilt verwijderen? (ja/nee): ")
 
     if confirm.lower() == "ja":
-        log("New admin user is deleted", "super_admin", f"username: {username}")
+        log("system admin is deleted", "super_admin", f"username: {username}")
         #  uit database verwijderen
+        deleteSystemAdministratorFromDatabase(connection, username)
         print(f"🗑️ '{username}' gemarkeerd voor verwijdering.")  # (nog te implementeren)
     else:
         print("Verwijdering geannuleerd.")
