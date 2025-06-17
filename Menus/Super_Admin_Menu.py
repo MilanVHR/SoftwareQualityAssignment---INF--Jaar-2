@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from Controllers.Logging import log
 
 
+from Controllers.Validations import isPasswordValid, isUsernameValid
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
 from Menus.System_Admin_Menu import backup_restore_submenu
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
@@ -67,11 +68,19 @@ def system_admin_submenu(connection):
 
 def add_system_admin(connection):
     print("\n--- Nieuwe System Administrator toevoegen ---")
-    username = input("Gebruikersnaam (8-10 tekens): ")
-    password = input("Wachtwoord: ")
+    while True:
+        username = input("Gebruikersnaam (8-10 tekens): ")
+        if (isUsernameValid(username)):
+            break
+
+    while True:
+        password = input("Wachtwoord: ")
+        if (isPasswordValid(password)):
+            break
     first_name = input("Voornaam: ")
     last_name = input("Achternaam: ")
     log("New admin user is created", "super_admin", f"username: {username}")
+
     # validatie + encryptie + toevoegen aan database
     toAdd = System_Administrator(
         username,
