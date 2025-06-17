@@ -28,7 +28,7 @@ def login_menu(connection):
         # TIJDELIJKk: hardcoded superadmin
         if username == "super_admin" and password == "Admin_123?":
             log("logged in", username)
-            super_admin_menu()
+            super_admin_menu(connection)
         elif role == Roles.System_Admin:
             log("logged in", username)
             system_admin_menu(connection, username)  # TIJDELIJK

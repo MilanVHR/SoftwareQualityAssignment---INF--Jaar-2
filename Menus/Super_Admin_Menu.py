@@ -1,13 +1,15 @@
 
 
+from datetime import datetime, timezone
 from Controllers.Logging import log
 
 
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
 from Menus.System_Admin_Menu import backup_restore_submenu
+from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
 
 
-def super_admin_menu():
+def super_admin_menu(connection):
     while True:
         print("\n=== SUPER ADMIN MENU ===")
         print("1. Beheer System Administrators")
@@ -20,7 +22,7 @@ def super_admin_menu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            system_admin_submenu()
+            system_admin_submenu(connection)
         elif choice == "2":
             service_engineer_submenu()
         elif choice == "3":
@@ -38,31 +40,7 @@ def super_admin_menu():
             print("Ongeldige keuze. Probeer opnieuw.")
 
 
-def system_admin_submenu():
-    while True:
-        print("\n--- Beheer System Administrators ---")
-        print("1. Nieuwe System Admin toevoegen")
-        print("2. Gegevens van System Admin wijzigen")
-        print("3. System Admin verwijderen")
-        print("4. Wachtwoord resetten")
-        print("0. Terug naar hoofdmenu")
-
-        choice = input("Maak een keuze: ")
-        if choice == "1":
-            print("→ Toevoegen van een System Admin ")  # (nog te implementeren)
-        elif choice == "2":
-            print("→ Wijzigen van een System Admin ")  # (nog te implementeren)
-        elif choice == "3":
-            print("→ Verwijderen van een System Admin ")  # (nog te implementeren)
-        elif choice == "4":
-            print("→ Reset wachtwoord voor een System Admin ")  # (nog te implementeren)
-        elif choice == "0":
-            break
-        else:
-            print("Ongeldige keuze.")
-
-
-def system_admin_submenu():
+def system_admin_submenu(connection):
     while True:
         print("\n--- Beheer System Administrators ---")
         print("1. Nieuwe System Admin toevoegen")
@@ -74,7 +52,7 @@ def system_admin_submenu():
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            add_system_admin()
+            add_system_admin(connection)
         elif choice == "2":
             update_system_admin()
         elif choice == "3":
@@ -87,7 +65,7 @@ def system_admin_submenu():
             print("Ongeldige keuze.")
 
 
-def add_system_admin():
+def add_system_admin(connection):
     print("\n--- Nieuwe System Administrator toevoegen ---")
     username = input("Gebruikersnaam (8-10 tekens): ")
     password = input("Wachtwoord: ")
@@ -95,7 +73,14 @@ def add_system_admin():
     last_name = input("Achternaam: ")
     log("New admin user is created", "super_admin", f"username: {username}")
     # validatie + encryptie + toevoegen aan database
-    print(f"Nieuwe system admin '{username}' voorbereid voor toevoegen.")  # (nog te implementeren)
+    toAdd = System_Administrator(
+        username,
+        password,
+        first_name,
+        last_name,
+        datetime.now(timezone.utc)
+    )
+    addSystemAdministratorToDatabase(connection, toAdd)
 
 
 def delete_system_admin():
