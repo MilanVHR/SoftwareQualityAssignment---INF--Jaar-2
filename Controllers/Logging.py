@@ -9,7 +9,6 @@ suspiciousFilePath = "./Logs/suspiciousLog.txt"
 
 
 def logString(message, critical=False):
-    print(message)
     os.makedirs("Logs", exist_ok=True)
     # Encrypt the message
     encrypted_message = Encrypt(message)
