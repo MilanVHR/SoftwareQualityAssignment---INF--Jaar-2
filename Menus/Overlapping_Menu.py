@@ -57,7 +57,7 @@ def service_engineer_submenu():
             print("Ongeldige keuze.")
 
 
-def traveller_submenu():
+def traveller_submenu(connection):
     while True:
         print("\n--- Beheer Travellers ---")
         print("1. Nieuwe Traveller toevoegen")
@@ -68,13 +68,13 @@ def traveller_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            print("→  Toevoegen van een Traveller")  # (nog te implementeren)
+            add_traveller(connection)
         elif choice == "2":
-            print("→  Wijzigen van een Traveller")  # (nog te implementeren)
+            update_traveller(connection)
         elif choice == "3":
-            print("→  Verwijderen van een Traveller")  # (nog te implementeren)
+            delete_traveller(connection)
         elif choice == "4":
-            print("→  Zoekfunctie voor Traveller")  # (nog te implementeren)
+            find_traveller(connection)
         elif choice == "0":
             break
         else:
@@ -153,7 +153,7 @@ def change_own_password(connection, username, role):
     if role == Roles.Service_Engineer:
         if newPassword:
             cursor.execute("UPDATE Service_Engineers SET Password=? WHERE Username=?",
-                          (Hash(newPassword), Encrypt(username)))
+                           (Hash(newPassword), Encrypt(username)))
         else:
             if newPassword:
                 cursor.execute("UPDATE System_Administrators SET Password=? WHERE Username=?",
@@ -224,3 +224,32 @@ def show_logs_menu():
             show_suspicious_logs()
         elif choice == "0":
             break
+
+
+def add_traveller(connection):
+    print("\n--- Nieuwe Traveller toevoegen ---")
+    first = input("Voornaam: ")
+    last = input("Achternaam: ")
+    birthday = input("Geboortedatum (YYYY-MM-DD): ")
+    gender = input("Geslacht: ")
+    street = input("Straatnaam: ")
+    number = input("Huisnummer: ")
+    zip_code = input("Postcode: ")
+    city = input("Woonplaats: ")
+    email = input("E-mailadres: ")
+    phone = input("Mobiel nummer: ")
+    license = input("Rijbewijsnummer: ")
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Travellers WHERE EmailAddress = ?", (email,))
+    if cursor.fetchone():
+        print("Een traveller met dit e-mailadres bestaat al.")
+        return
+
+    cursor.execute("""
+        INSERT INTO Travellers 
+        (FirstName, LastName, Birthday, Gender, StreetName, HouseNumber, ZipCode, City, EmailAddress, MobilePhone, DrivingLicenseNumber)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (first, last, birthday, gender, street, number, zip_code, city, email, phone, license))
+    connection.commit()
+    print("Traveller succesvol toegevoegd.")
