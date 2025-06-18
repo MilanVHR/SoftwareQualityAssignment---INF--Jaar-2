@@ -7,8 +7,8 @@ def isPasswordValid(password) :
     else:
         return False
 
-def isdriversLicenseValid(licence):
-    pattern = r"^[A-Za-z]{2}\d{7}$|^[A-Za-z]{1}\d{6}$"
+def isDriversLicenseValid(licence):
+    pattern = r"^[A-Za-z]{2}\d{7}$|^[A-Za-z]{1}\d{8}$"
     if re.match(pattern, licence):
         return True
     else:
@@ -45,6 +45,13 @@ def isDateValid(date):
 def isUsernameValid(name):
     pattern = r"^[a-zA-Z_][a-zA-Z0-9_'.]{7,9}$"
     if re.match(pattern, name):
+        return True
+    else:
+        return False
+
+def isEmailValid(email):
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    if re.match(pattern, email):
         return True
     else:
         return False
