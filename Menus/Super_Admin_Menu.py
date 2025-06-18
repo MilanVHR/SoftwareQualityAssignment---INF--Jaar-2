@@ -1,11 +1,16 @@
 
 
 from datetime import date
+import os
+import random
+import string
 from Controllers.Logging import log
 
 
 from Controllers.Validations import isPasswordValid, isUsernameValid
+from Database.DBBackUp import Backup_database, Restore_database
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
+from Model.Backup_Code import addBackUpCodeToDatabase, Backup_Code, deleteBackUpCodeFromDatabase, findBackupCode
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase, findSystemAdministrator, updateSystemAdministratorInDatabase
 
 
@@ -30,7 +35,7 @@ def super_admin_menu(connection):
         elif choice == "4":
             scooter_submenu(connection)
         elif choice == "5":
-            backup_restore_submenu()
+            backup_submenu(connection)
         elif choice == "6":
             show_logs_menu()
         elif choice == "0":
@@ -125,6 +130,14 @@ def update_system_admin(connection):
                 break
             elif (choice == "0"):
                 return
+        else:
+            print(f"Geen systeem admins gevonden met: {username}")
+            print("Opnieuw zoeken?")
+            print("1. Ja")
+            print("2. Nee, menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "2"):
+                return
     
     sysAdminToChange = system_administrators[0]
     while True:
@@ -182,7 +195,7 @@ def reset_system_admin_password(connection):
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.")
 
 
-def backup_restore_submenu():
+def backup_submenu(connection):
     while True:
         print("\n--- Backup en Restore ---")
         print("1. Backup maken van systeem")
@@ -193,18 +206,128 @@ def backup_restore_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            log("back up created", "system_admin")
-            print("→  Backup maken")  # (nog te implementeren)
+            createdPath = Backup_database()
+            print(f"Back up is aangemaakt: {createdPath}")
+            log("Created backup", "super_admin", f"backup filename: {createdPath}")
         elif choice == "2":
-            log("restore code generated", "system_admin")
-            print("→  Restore-code genereren")  # (nog te implementeren)
+            backup_create_code_submenu(connection)
         elif choice == "3":
-            log("restore code deleted", "system_admin")
-            print("→  Restore-code intrekken")  # (nog te implementeren)
+            backup_delete_code_submenu(connection)
         elif choice == "4":
-            log("Backup gebruikt", "system_admin")
-            print("+  Backup is benut") # (nog te implementeren)
+            backup_restore_submenu()
         elif choice == "0":
             break
         else:
             print("Ongeldige keuze.")
+
+def backup_create_code_submenu(connection):
+    while True:
+        print("\n--- Backup code genereren ---")
+        backup_file_names = [f for f in os.listdir("./Backups/") if os.path.isfile(os.path.join("./Backups/", f))]
+        for file in backup_file_names:
+            print(file)
+        print("0. Terug naar vorige menu")
+        choice = input("Voer de naam in van de backup: ")
+
+        if (choice == "0"):
+            return
+        
+        if (choice in backup_file_names):
+            break
+    
+    code = generate_random_code()
+
+    while True:
+        system_admin_username = input("Gebruikersnaam van de systeem admin die de code mag gebruiken: ")
+
+        system_administrators = findSystemAdministrator(connection.cursor(), system_admin_username)
+        if (len(system_administrators) > 0):
+            print(f"System Administrator met de gebruikers naam: '{system_administrators[0].Username}' gevonden. Is dit juist?")
+            print("1. Ja")
+            print("2. Nee")
+            print("0. Menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "1"):
+                break
+            elif (confirmation == "0"):
+                return
+        else:
+            print(f"Geen systeem admins gevonden met: {system_admin_username}")
+            print("Opnieuw zoeken?")
+            print("1. Ja")
+            print("2. Nee, menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "2"):
+                return
+
+    
+    backupCode = Backup_Code(
+        choice,
+        code,
+        system_administrators[0].Username
+    )
+    addBackUpCodeToDatabase(connection, backupCode)
+
+    print(f"\nBackup code: '{code}' aangemaakt voor: '{system_administrators[0].Username}'")
+    log("backup code created", "super_admin", f"for system admin: {system_administrators[0].Username}, filename: {choice}")
+
+def generate_random_code(length=10):
+    # Define the characters to use
+    characters = string.ascii_letters + string.digits  # A-Z, a-z, 0-9
+    # Generate the random code
+    return ''.join(random.choice(characters) for _ in range(length))
+
+def backup_delete_code_submenu(connection):
+    while True:
+        print("\n--- Verwijderen van een Backup Code ---")
+        backupCode = input("Voer code in die verwijdert moet worden: ")
+
+        backupCodes = findBackupCode(connection.cursor(), backupCode)
+        if (len(backupCodes) > 0):
+            print(f"Backup code gevonden met code:'{backupCodes[0].Code}' voor systeem admin:{backupCodes[0].System_Administrator_Username}. Is dit juist?")
+            print("1. Ja, verwijder")
+            print("2. Nee en behou")
+            print("0. Menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "1"):
+                break
+            elif (confirmation == "0"):
+                return
+        else:
+            print(f"Geen backup codes gevonden met code: {backupCode}")
+            print("Opnieuw zoeken?")
+            print("1. Ja")
+            print("2. Nee, menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "2"):
+                return
+    
+    deleteBackUpCodeFromDatabase(connection, backupCodes[0].Code)
+    print(f"backup code: {backupCodes[0].Code} verwijdert")
+    log("backup code created", "super_admin", f"for system admin: {backupCodes[0].System_Administrator_Username}, filename: {backupCodes[0].Filename}")
+
+
+def backup_restore_submenu():
+    while True:
+        print("\n--- Backup herstellen ---")
+        backup_file_names = [f for f in os.listdir("./Backups/") if os.path.isfile(os.path.join("./Backups/", f))]
+        for file in backup_file_names:
+            print(file)
+        print("0. Terug naar vorige menu")
+        choice = input("Voer de naam in van de backup: ")
+
+        if (choice == "0"):
+            return
+        
+        if (choice in backup_file_names):
+            break
+
+    while True:
+        confirmation = input(f"Weet je zeker dat je backup '{choice}' wilt herstellen? (ja/nee):)")
+        if (confirmation.lower() == "ja"):
+            break
+        elif (confirmation.lower() == "nee"):
+            return
+    Restore_database(choice)
+    log("backup code restored", "super_admin", f"filename: {choice}")
+
