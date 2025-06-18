@@ -241,9 +241,9 @@ def add_traveller(connection):
     license = input("Rijbewijsnummer: ")
 
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Travellers WHERE EmailAddress = ?", (email,))
+    cursor.execute("SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
     if cursor.fetchone():
-        print("Een traveller met dit e-mailadres bestaat al.")
+        print("Een traveller met dit e-rijbewijsnummer bestaat al.")
         return
 
     cursor.execute("""
@@ -256,9 +256,10 @@ def add_traveller(connection):
 
 
 def update_traveller(connection):
-    email = input("\nVoer het e-mailadres van de traveller in die je wilt wijzigen: ")
+    license = input(
+        "\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen: ")
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Travellers WHERE EmailAddress = ?", (email,))
+    cursor.execute("SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
     if not cursor.fetchone():
         print("Traveller niet gevonden.")
         return
@@ -279,7 +280,42 @@ def update_traveller(connection):
 
     for column, value in fields.items():
         if value:
-            cursor.execute(f"UPDATE Travellers SET {column} = ? WHERE EmailAddress = ?", (value, email))
+            cursor.execute(
+                f"UPDATE Travellers SET {column} = ? WHERE DrivingLicenseNumber = ?", (value, license))
 
     connection.commit()
     print("Gegevens bijgewerkt.")
+
+
+def delete_traveller(connection):
+    license = input("\nVoer het rijbewijsnummer in van de traveller die je wilt verwijderen: ")
+    confirm = input(f"Weet je zeker dat je traveller met rijbewijsnummer '{license}' wilt verwijderen? (ja/nee): ")
+    if confirm.lower() != "ja":
+        print("Verwijdering geannuleerd.")
+        return
+
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+    connection.commit()
+
+    print("Traveller verwijderd.")
+
+
+def find_traveller(connection):
+    license = input("\nVoer het rijbewijsnummer in van de traveller die je zoekt: ")
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+    result = cursor.fetchone()
+
+    if result:
+        print("\nGegevens van Traveller:")
+        print(f"Voornaam: {result[1]}")
+        print(f"Achternaam: {result[2]}")
+        print(f"Geboortedatum: {result[3]}")
+        print(f"Geslacht: {result[4]}")
+        print(f"Adres: {result[5]} {result[6]}, {result[8]} {result[7]}")
+        print(f"E-mail: {result[9]}")
+        print(f"Mobiel: {result[10]}")
+        print(f"Rijbewijsnummer: {result[11]}")
+    else:
+        print("Traveller niet gevonden.")
