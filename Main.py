@@ -48,7 +48,7 @@ def login_menu(connection):
             else:
                 log("Unsuccessful login", "",
                     f"username: {username} is used for a login attempt with a wrong password", True)
-                print("Onjuiste inloggegevens of nog niet geïmplementeerd.")
+                print("Onjuiste inloggegevens.")
             # system_admin_menu() en service_engineer_menu() aanroepen
 
 
