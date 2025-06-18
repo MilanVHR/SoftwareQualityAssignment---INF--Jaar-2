@@ -1,3 +1,4 @@
+from datetime import date
 import sqlite3
 from Controllers.Logging import readLog, readSuspiciousLog
 import time
@@ -29,7 +30,7 @@ def own_profile_submenu(connection, username, role):
             break
 
 
-def service_engineer_submenu():
+def service_engineer_submenu(connection):
     while True:
         print("\n--- Beheer Service Engineers ---")
         print("1. Nieuwe Service Engineer toevoegen")
@@ -40,17 +41,13 @@ def service_engineer_submenu():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            # (nog te implementeren)
-            print("→ Toevoegen van een Service Engineer")
+            add_service_engineer(connection)
         elif choice == "2":
-            # (nog te implementeren)
-            print("→  Wijzigen van een Service Engineer")
+            update_service_engineer(connection)
         elif choice == "3":
-            # (nog te implementeren)
-            print("→  Verwijderen van een Service Engineer")
+            delete_service_engineer(connection)
         elif choice == "4":
-            # (nog te implementeren)
-            print("→  Reset wachtwoord voor een Service Engineer")
+            reset_service_engineer_password(connection)
         elif choice == "0":
             break
         else:
@@ -115,7 +112,7 @@ def view_own_profile(cursor, username, role):
     result = cursor.fetchone()
 
     if result:
-        print("\n👤 Profielgegevens:")
+        print("\nProfielgegevens:")
         print(f"Voornaam: {Decrypt(result[2])}")
         print(f"Achternaam: {Decrypt(result[3])}")
         print(f"Geregistreerd op: {result[4]}")
@@ -175,7 +172,7 @@ def delete_own_account(connection, username, role):
 
         connection.commit()
 
-        print(" Account verwijderd. Je bent nu uitgelogd.")
+        print("Account verwijderd. Je bent nu uitgelogd.")
         time.sleep(3)
         exit()  # Verlaat de applicatie na verwijderen
     else:
@@ -319,3 +316,25 @@ def find_traveller(connection):
         print(f"Rijbewijsnummer: {result[11]}")
     else:
         print("Traveller niet gevonden.")
+
+
+def add_service_engineer(connection):
+    print("\n--- Nieuwe Service Engineer toevoegen ---")
+    username = input("Gebruikersnaam: ")
+    first_name = input("Voornaam: ")
+    last_name = input("Achternaam: ")
+    password = input("Wachtwoord: ")
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Service_Engineers WHERE Username = ?", (Encrypt(username),))
+    if cursor.fetchone():
+        print("Deze gebruikersnaam bestaat al.")
+        return
+
+    cursor.execute("""
+        INSERT INTO Service_Engineers (Username, Password, First_Name, Last_Name, Registration_date)
+        VALUES (?, ?, ?, ?, ?)
+    """, (Encrypt(username), Hash(password), Encrypt(first_name), Encrypt(last_name), date.today()))
+
+    connection.commit()
+    print("Service Engineer succesvol toegevoegd.")
