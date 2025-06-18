@@ -34,7 +34,7 @@ def login_menu(connection):
             system_admin_menu(connection, username)  # TIJDELIJK
         elif role == Roles.Service_Engineer:
             log("logged in", username)
-            service_engineer_menu(username)  # TIJDELIJK
+            service_engineer_menu(connection, username)  # TIJDELIJK
         else:
             # Checken in de databasse
             attempts += 1

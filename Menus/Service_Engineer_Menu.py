@@ -16,11 +16,11 @@ def service_engineer_menu(connection, username):
         choice = input("Maak een keuze: ")
 
         if choice == "1":
-            own_profile_submenu(connection, username, Roles.Service_Engineer)  # (nog te implementeren)
+            own_profile_submenu(connection, username, Roles.Service_Engineer)
         elif choice == "2":
             update_scooter_attributes(username)
         elif choice == "3":
-            search_scooter()
+            search_scooter(username)
         elif choice == "0":
             print("Je bent uitgelogd.\n")
             break

@@ -3,7 +3,7 @@ from Controllers.Logging import readLog, readSuspiciousLog
 import time
 
 from Database.DBCheckUser import Roles
-from Encryption.Encryptor import Decrypt, Encrypt
+from Encryption.Encryptor import Decrypt, Encrypt, Hash
 
 
 def own_profile_submenu(connection, username, role):
@@ -148,7 +148,16 @@ def update_own_name(connection, username, role):
 
 
 def change_own_password(connection, username, role):
-    return
+    newPassword = input("Nieuwe wachtwoord (Enter om te behouden): ")
+    cursor = connection.cursor()
+    if role == Roles.Service_Engineer:
+        if newPassword:
+            cursor.execute("UPDATE Service_Engineers SET Password=? WHERE Username=?",
+                          (Hash(newPassword), Encrypt(username)))
+        else:
+            if newPassword:
+                cursor.execute("UPDATE System_Administrators SET Password=? WHERE Username=?",
+                               (Hash(newPassword), Encrypt(username)))
 
 
 def delete_own_account(connection, username, role):
