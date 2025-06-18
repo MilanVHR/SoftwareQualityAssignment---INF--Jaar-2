@@ -238,7 +238,8 @@ def add_traveller(connection):
     license = input("Rijbewijsnummer: ")
 
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+    cursor.execute(
+        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
     if cursor.fetchone():
         print("Een traveller met dit e-rijbewijsnummer bestaat al.")
         return
@@ -256,7 +257,8 @@ def update_traveller(connection):
     license = input(
         "\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen: ")
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+    cursor.execute(
+        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
     if not cursor.fetchone():
         print("Traveller niet gevonden.")
         return
@@ -285,23 +287,28 @@ def update_traveller(connection):
 
 
 def delete_traveller(connection):
-    license = input("\nVoer het rijbewijsnummer in van de traveller die je wilt verwijderen: ")
-    confirm = input(f"Weet je zeker dat je traveller met rijbewijsnummer '{license}' wilt verwijderen? (ja/nee): ")
+    license = input(
+        "\nVoer het rijbewijsnummer in van de traveller die je wilt verwijderen: ")
+    confirm = input(
+        f"Weet je zeker dat je traveller met rijbewijsnummer '{license}' wilt verwijderen? (ja/nee): ")
     if confirm.lower() != "ja":
         print("Verwijdering geannuleerd.")
         return
 
     cursor = connection.cursor()
-    cursor.execute("DELETE FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+    cursor.execute(
+        "DELETE FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
     connection.commit()
 
     print("Traveller verwijderd.")
 
 
 def find_traveller(connection):
-    license = input("\nVoer het rijbewijsnummer in van de traveller die je zoekt: ")
+    license = input(
+        "\nVoer het rijbewijsnummer in van de traveller die je zoekt: ")
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+    cursor.execute(
+        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
     result = cursor.fetchone()
 
     if result:
@@ -326,7 +333,8 @@ def add_service_engineer(connection):
     password = input("Wachtwoord: ")
 
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Service_Engineers WHERE Username = ?", (Encrypt(username),))
+    cursor.execute(
+        "SELECT * FROM Service_Engineers WHERE Username = ?", (Encrypt(username),))
     if cursor.fetchone():
         print("Deze gebruikersnaam bestaat al.")
         return
@@ -338,3 +346,65 @@ def add_service_engineer(connection):
 
     connection.commit()
     print("Service Engineer succesvol toegevoegd.")
+
+
+def update_service_engineer(connection):
+    username = input("\nVoer de gebruikersnaam in van de Service Engineer: ")
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM Service_Engineers WHERE Username = ?", (Encrypt(username),))
+    if not cursor.fetchone():
+        print("Service Engineer niet gevonden.")
+        return
+
+    print("Laat een veld leeg om deze ongewijzigd te laten.")
+    new_first = input("Nieuwe voornaam: ")
+    new_last = input("Nieuwe achternaam: ")
+
+    if new_first:
+        cursor.execute("UPDATE Service_Engineers SET First_Name = ? WHERE Username = ?",
+                       (Encrypt(new_first), Encrypt(username)))
+    if new_last:
+        cursor.execute("UPDATE Service_Engineers SET Last_Name = ? WHERE Username = ?",
+                       (Encrypt(new_last), Encrypt(username)))
+
+    connection.commit()
+    print("Gegevens bijgewerkt.")
+
+
+def delete_service_engineer(connection):
+    username = input(
+        "\nVoer de gebruikersnaam in van de Service Engineer die je wilt verwijderen: ")
+    confirm = input(
+        f"Weet je zeker dat je '{username}' wilt verwijderen? (ja/nee): ")
+    if confirm.lower() != "ja":
+        print("Verwijdering geannuleerd.")
+        return
+
+    cursor = connection.cursor()
+    cursor.execute(
+        "DELETE FROM Service_Engineers WHERE Username = ?", (Encrypt(username),))
+    connection.commit()
+
+    print("Service Engineer verwijderd.")
+
+
+def reset_service_engineer_password(connection):
+    username = input("\nGebruikersnaam van de Service Engineer: ")
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM Service_Engineers WHERE Username = ?", (Encrypt(username),))
+    if not cursor.fetchone():
+        print("Service Engineer niet gevonden.")
+        return
+
+    new_password = input("Nieuw wachtwoord: ")
+    if not new_password:
+        print("Ongeldig wachtwoord.")
+        return
+
+    cursor.execute("UPDATE Service_Engineers SET Password = ? WHERE Username = ?",
+                   (Hash(new_password), Encrypt(username)))
+    connection.commit()
+
+    print("Wachtwoord opnieuw ingesteld.")
