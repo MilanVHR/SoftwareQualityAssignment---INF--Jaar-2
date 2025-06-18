@@ -58,7 +58,7 @@ def updateScooterInDatabase(connection: Connection, scooter: Scooter):
         (scooter.Brand, scooter.Model, scooter.Top_Speed, scooter.Battery_Capacity, scooter.State_of_Charge, scooter.Target_Range_SoC, f"{scooter.Location[0]}, {scooter.Location[1]}", scooter.Is_Out_Of_Service, scooter.Mileage, f"{scooter.Last_Maintenance_Date}", scooter.Serial_Number))
     connection.commit()
 
-def findScooters(cursor, Serial_Number=None, Brand=None, Model=None, Top_Speed=None, Battery_Capacity=None, State_of_Charge=None, Target_Range_SoC=None, Location=None, Is_Out_Of_Service=None, Mileage=None, Last_Maintenance_Date=None, amount=None):
+def findScooters(cursor, Serial_Number=None, Brand=None, Model=None, Top_Speed=None, Battery_Capacity=None, State_of_Charge=None, Target_Range_SoC=None, Location=None, Is_Out_Of_Service=None, Mileage=None, Last_Maintenance_Date=None, amount=None) -> list[Scooter]:
     query = "SELECT * FROM Scooters"
     conditions = []
     params = []

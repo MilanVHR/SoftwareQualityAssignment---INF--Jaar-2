@@ -7,9 +7,10 @@ import sys
 import time
 from Controllers.Logging import log
 
-from Menus.Service_Engineer_Menu import service_engineer_menu
+from Menus.Service_Engineer_Menu import service_engineer_menu, update_scooter_attributes
 from Menus.Super_Admin_Menu import super_admin_menu
 from Menus.System_Admin_Menu import system_admin_menu
+from Model.Scooter import Scooter, addScooterToDatabase
 from Model.Service_Engineer import Service_Engineer, addServiceEngineerToDatabase
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase
 
@@ -77,6 +78,8 @@ if __name__ == "__main__":
     db.SetupBackupCodes(cursor)
     # se = Service_Engineer(Username="Milan", Password="Uilskuiken69", First_Name="Milan", Last_Name="Versluis", Registration_date= date(2020, 12, 24))
     # sa = System_Administrator(Username="Esmée", Password="Uilskuiken69", First_Name="Esmée", Last_Name="Biersteker", Registration_date= date(2020, 12, 24))
+    #s = Scooter("AAAAAAAAAAAA", "AAA", "AAA", 100, 100, 100, 100, (100,100), False, 100, date(2025,10,10))
     # addServiceEngineerToDatabase(connection, se)
     # addSystemAdministratorToDatabase(connection, se)
+    #addScooterToDatabase(connection,s)
     login_menu(connection)

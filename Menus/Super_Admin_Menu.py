@@ -6,7 +6,6 @@ from Controllers.Logging import log
 
 from Controllers.Validations import isPasswordValid, isUsernameValid
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
-from Menus.System_Admin_Menu import backup_restore_submenu
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase, findSystemAdministrator, updateSystemAdministratorInDatabase
 
 
@@ -29,7 +28,7 @@ def super_admin_menu(connection):
         elif choice == "3":
             traveller_submenu(connection)
         elif choice == "4":
-            scooter_submenu()
+            scooter_submenu(connection)
         elif choice == "5":
             backup_restore_submenu()
         elif choice == "6":
