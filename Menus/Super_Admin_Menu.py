@@ -202,7 +202,6 @@ def backup_restore_submenu(connection):
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            log("back up created", "system_admin")
             createdPath = Backup_database()
             print(f"Back up is aangemaakt: {createdPath}")
             log("Created backup", "super_admin", f"backup filename: {createdPath}")
