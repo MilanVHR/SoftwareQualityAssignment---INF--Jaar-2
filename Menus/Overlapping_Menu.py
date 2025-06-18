@@ -539,3 +539,41 @@ def update_scooter_menu(connection):
 
     connection.commit()
     print("Gegevens bijgewerkt.")
+
+
+def delete_scooter_menu(connection):
+    serial = input("\nVoer het serienummer in van de scooter die je wilt verwijderen: ")
+    confirm = input(f"Weet je zeker dat je scooter '{serial}' wilt verwijderen? (ja/nee): ")
+    if confirm.lower() != "ja":
+        print("Verwijdering geannuleerd.")
+        return
+
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM Scooters WHERE Serial_Number = ?", (serial,))
+    connection.commit()
+
+    print("Scooter verwijderd.")
+
+
+def find_scooter_menu(connection):
+    serial = input("\nVoer het serienummer in van de scooter die je wilt zoeken: ")
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Scooters WHERE Serial_Number = ?", (serial,))
+    scooter = cursor.fetchone()
+
+    if not scooter:
+        print("Scooter niet gevonden.")
+        return
+
+    print("\n🔎 Scootergegevens:")
+    print(f"Serienummer: {scooter[0]}")
+    print(f"Merk: {scooter[1]}")
+    print(f"Model: {scooter[2]}")
+    print(f"Topsnelheid: {scooter[3]} km/u")
+    print(f"Batterijcapaciteit: {scooter[4]} Wh")
+    print(f"SoC: {scooter[5]} %")
+    print(f"Doel-SoC: {scooter[6]} %")
+    print(f"Locatie: {scooter[7]}")
+    print(f"Defect: {'Ja' if scooter[8] else 'Nee'}")
+    print(f"Kilometerstand: {scooter[9]} km")
+    print(f"Laatst onderhouden: {scooter[10]}")
