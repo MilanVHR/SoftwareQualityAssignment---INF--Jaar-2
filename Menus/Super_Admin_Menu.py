@@ -6,7 +6,6 @@ from Controllers.Logging import log
 
 from Controllers.Validations import isPasswordValid, isUsernameValid
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
-from Menus.System_Admin_Menu import backup_restore_submenu
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase, findSystemAdministrator, updateSystemAdministratorInDatabase
 
 
