@@ -164,7 +164,7 @@ def update_scooter_attributes(connection, username):
             log("Scooter: service date updated", username, f"scooter serial number: {scooter.Serial_Number}, new date: {date}")
 
             # DB-update
-            scooter.Last_Maintenance_Date = date
+            scooter.Last_Maintenance_Date = date.date()
             updateScooterInDatabase(connection, scooter)
             print(f"Laatste onderhoudsdatum bijgewerkt naar {date}")
         
