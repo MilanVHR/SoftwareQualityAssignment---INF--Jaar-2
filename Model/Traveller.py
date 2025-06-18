@@ -56,7 +56,6 @@ def addTravellerToDatabase(connection:Connection, traveller:Traveller):
             ZipCode, City, EmailAddress, MobilePhone, DrivingLicenseNumber
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
-            encryptedData['Driving_License_Number'],
             encryptedData['First_Name'],
             encryptedData['Last_Name'],
             encryptedData['Birthday'],
@@ -66,19 +65,33 @@ def addTravellerToDatabase(connection:Connection, traveller:Traveller):
             encryptedData['Zip_Code'],
             encryptedData['City'],
             encryptedData['Email_Address'],
-            encryptedData['Mobile_Phone']
+            encryptedData['Mobile_Phone'],
+            encryptedData['Driving_License_Number'],
         ))
     connection.commit()
 
 def deleteTravellerFromDatabase(connection:Connection ,license_number: str):
-    connection.cursor().execute("DELETE FROM Travellers WHERE Driving_License_Number = ?", (license_number,))
+    connection.cursor().execute("DELETE FROM Travellers WHERE DrivingLicenseNumber = ?", (Encrypt(license_number),))
     connection.commit()
 
 def updateTravellerInDatabase(connection: Connection, traveller: Traveller):
+    encryptedData = encryptTraveller(traveller)
     connection.cursor().execute("""UPDATE Travellers
-        SET First_Name = ?, Last_Name = ?, Birthday = ?, Gender = ?, Street_Name = ?, House_Number = ?, Zip_Code = ?, City = ?, Email_Address = ?, Mobile_Phone = ?
-        WHERE Driving_License_Number = ?""", 
-        (traveller.First_Name, traveller.Last_Name, f"{traveller.Birthday}", traveller.Gender, traveller.Street_Name, traveller.House_Number, traveller.Zip_Code, traveller.City.value, traveller.Email_Address, traveller.Mobile_Phone, traveller.Driving_License_Number))
+        SET FirstName = ?, LastName = ?, Birthday = ?, Gender = ?, StreetName = ?, HouseNumber = ?, ZipCode = ?, City = ?, EmailAddress = ?, MobilePhone = ?
+        WHERE DrivingLicenseNumber = ?""", 
+        (
+            encryptedData['First_Name'],
+            encryptedData['Last_Name'],
+            encryptedData['Birthday'],
+            encryptedData['Gender'],
+            encryptedData['Street_Name'],
+            encryptedData['House_Number'],
+            encryptedData['Zip_Code'],
+            encryptedData['City'],
+            encryptedData['Email_Address'],
+            encryptedData['Mobile_Phone'],
+            encryptedData['Driving_License_Number']
+        ))
     connection.commit()
 
 def encryptTraveller(traveller: Traveller):
@@ -88,12 +101,12 @@ def encryptTraveller(traveller: Traveller):
     encrypted_data['Driving_License_Number'] = Encrypt(traveller.Driving_License_Number)
     encrypted_data['First_Name'] = Encrypt(traveller.First_Name)
     encrypted_data['Last_Name'] = Encrypt(traveller.Last_Name)
-    encrypted_data['Birthday'] = Encrypt(traveller.Birthday)
+    encrypted_data['Birthday'] = Encrypt(str(traveller.Birthday))
     encrypted_data['Gender'] = Encrypt(traveller.Gender)
     encrypted_data['Street_Name'] = Encrypt(traveller.Street_Name)
-    encrypted_data['House_Number'] = Encrypt(traveller.House_Number)
+    encrypted_data['House_Number'] = Encrypt(str(traveller.House_Number))
     encrypted_data['Zip_Code'] = Encrypt(traveller.Zip_Code)
-    encrypted_data['City'] = Encrypt(traveller.City)
+    encrypted_data['City'] = Encrypt(traveller.City.value)
     encrypted_data['Email_Address'] = Encrypt(traveller.Email_Address)
     encrypted_data['Mobile_Phone'] = Encrypt(traveller.Mobile_Phone)
     
@@ -109,13 +122,13 @@ def decryptTraveller(encrypted_data):
         Street_Name=Decrypt(encrypted_data['Street_Name']),
         House_Number=Decrypt(encrypted_data['House_Number']),
         Zip_Code=Decrypt(encrypted_data['Zip_Code']),
-        City=Decrypt(encrypted_data['City']),
+        City=CityEnum(Decrypt(encrypted_data['City'])),
         Email_Address=Decrypt(encrypted_data['Email_Address']),
         Mobile_Phone=Decrypt(encrypted_data['Mobile_Phone'])
     )
 
 def findTravellers(cursor, Driving_License_Number=None, First_Name=None, Last_Name=None, Birthday=None, Gender=None, Street_Name=None, House_Number=None, Zip_Code=None, City=None, Email_Address=None, Mobile_Phone=None
-):
+) -> list[Traveller]:
     cursor.execute("SELECT * FROM Travellers")
     # Fetching all isnt a very good idea in production
     # however I have not foun a way to support partial
@@ -125,17 +138,17 @@ def findTravellers(cursor, Driving_License_Number=None, First_Name=None, Last_Na
 
     for row in encrypted_rows:
         encrypted_data = {
-            'Driving_License_Number': row[1],
-            'First_Name': row[2],
-            'Last_Name': row[3],
-            'Birthday': row[4],
-            'Gender': row[5],
-            'Street_Name': row[6],
-            'House_Number': row[7],
-            'Zip_Code': row[8],
-            'City': row[9],
-            'Email_Address': row[10],
-            'Mobile_Phone': row[11]
+            'First_Name': row[1],
+            'Last_Name': row[2],
+            'Birthday': row[3],
+            'Gender': row[4],
+            'Street_Name': row[5],
+            'House_Number': row[6],
+            'Zip_Code': row[7],
+            'City': row[8],
+            'Email_Address': row[9],
+            'Mobile_Phone': row[10],
+            'Driving_License_Number': row[11],
         }
 
         # Use decryptTraveller to get a Traveller object
