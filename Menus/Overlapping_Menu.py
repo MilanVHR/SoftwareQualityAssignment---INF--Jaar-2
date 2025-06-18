@@ -4,10 +4,11 @@ import sqlite3
 from Controllers.Logging import log, readLog, readSuspiciousLog
 import time
 
-from Controllers.Validations import isSerialNumberValid
+from Controllers.Validations import isEmailValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
 from Model.Scooter import Scooter, addScooterToDatabase
+from Model.Traveller import CityEnum, Traveller, addTravellerToDatabase, deleteTravellerFromDatabase, findTravellers, updateTravellerInDatabase
 
 
 def own_profile_submenu(connection, username, role):
@@ -230,102 +231,235 @@ def add_traveller(connection):
     print("\n--- Nieuwe Traveller toevoegen ---")
     first = input("Voornaam: ")
     last = input("Achternaam: ")
-    birthday = input("Geboortedatum (YYYY-MM-DD): ")
+    
+    birthday_str = ""
+    while True:
+        birthday_str = input("Geboortedatum (YYYY-MM-DD): ")
+        try:
+            birthday = datetime.strptime(birthday_str, "%Y-%m-%d")
+            break
+        except ValueError:
+            print("Ongeldig datumformaat")
+
     gender = input("Geslacht: ")
     street = input("Straatnaam: ")
-    number = input("Huisnummer: ")
-    zip_code = input("Postcode: ")
-    city = input("Woonplaats: ")
-    email = input("E-mailadres: ")
-    phone = input("Mobiel nummer: ")
-    license = input("Rijbewijsnummer: ")
+    
+    number_str = ""
+    while not number_str.isdigit() or int(number_str) <= 0:
+        number_str = input("Huisnummer: ").strip()
+        if not number_str.isdigit():
+            print("Voer een positief getal in")
+        elif int(number_str) <= 0:
+            print("Huisnummer moet > 0 zijn")
+    number = int(number_str)
+
+    zip_code = ""
+    while not isZipcodeValid(zip_code):
+        zip_code = input("Postcode: ").strip().upper()
+        if not isZipcodeValid(zip_code):
+            print("Ongeldig formaat (gebruik 1234AB)")
+
+    city_str = ""
+    cities = [city.name for city in CityEnum]
+    while city_str.strip().upper() not in cities:
+        city_str = input(f"Woonplaats ({', '.join(cities)}): ").strip()
+        if city_str.upper() not in cities:
+            print("Kies uit de voorgedefinieerde steden")
+    
+    email = ""
+    while not isEmailValid(email):
+        email = input("E-mailadres: ").strip()
+        if not isEmailValid(email):
+            print("Ongeldig e-mailformaat")
+
+    phone = ""
+    while not isPhoneNumberValid(phone):
+        phone = input("Mobiel nummer (8 cijfers): ").strip()
+        if not isPhoneNumberValid(phone):
+            print("Voer 8 cijfers in (bijv. 06123456)")
+    
+    
+    license = ""
+    while not isDriversLicenseValid(license):
+        license = input("Rijbewijsnummer (XX1234567 of X12345678): ").strip().upper()
+        if not isDriversLicenseValid(license):
+            print("Ongeldig formaat (XX1234567 of X12345678)")
 
     cursor = connection.cursor()
     cursor.execute(
-        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
+        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (Encrypt(license),))
     if cursor.fetchone():
         print("Een traveller met dit e-rijbewijsnummer bestaat al.")
         return
 
-    cursor.execute("""
-        INSERT INTO Travellers 
-        (FirstName, LastName, Birthday, Gender, StreetName, HouseNumber, ZipCode, City, EmailAddress, MobilePhone, DrivingLicenseNumber)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (first, last, birthday, gender, street, number, zip_code, city, email, phone, license))
+    addTravellerToDatabase(connection, Traveller(
+        Driving_License_Number=license,
+        First_Name=first,
+        Last_Name=last,
+        Birthday=birthday,
+        Gender=gender,
+        Street_Name=street,
+        House_Number=number,
+        Zip_Code=zip_code,
+        City=CityEnum[city_str.upper()],
+        Email_Address=email,
+        Mobile_Phone=phone
+    ))
     connection.commit()
     print("Traveller succesvol toegevoegd.")
 
 
 def update_traveller(connection):
-    license = input(
-        "\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen: ")
+    license = ""
+    while not isDriversLicenseValid(license):
+        license = input("\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen (XX1234567 of X12345678): ").strip().upper()
+        if not isDriversLicenseValid(license):
+            print("Ongeldig formaat (XX1234567 of X12345678)")
+
     cursor = connection.cursor()
-    cursor.execute(
-        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
-    if not cursor.fetchone():
+    found = findTravellers(cursor, Driving_License_Number=license)
+    if len(found) <= 0:
         print("Traveller niet gevonden.")
         return
-
+    traveller = found[0]
+    
     print("Laat een veld leeg om het ongewijzigd te laten.")
+    first = input("Voornaam: ")
+    last = input("Achternaam: ")
+
+    birthday_str = ""
+    while True:
+        birthday_str = input("Geboortedatum (YYYY-MM-DD): ")
+        if birthday_str == "":
+            break
+
+        try:
+            birthday = datetime.strptime(birthday_str, "%Y-%m-%d")
+            break
+        except ValueError:
+            print("Ongeldig datumformaat")
+
+    gender = input("Geslacht: ")
+    street = input("Straatnaam: ")
+
+    number_str = ""
+    while not number_str.isdigit() or int(number_str) <= 0:
+        number_str = input("Huisnummer: ").strip()
+        if number_str == "":
+            
+            break
+        else:
+            if not number_str.isdigit():
+                print("Voer een positief getal in")
+            elif int(number_str) <= 0:
+                print("Huisnummer moet > 0 zijn")
+            else:
+                number = int(number_str)
+    
+
+    zip_code = ""
+    while not isZipcodeValid(zip_code):
+        zip_code = input("Postcode: ").strip().upper()
+        if zip_code == "":
+            break
+        if not isZipcodeValid(zip_code):
+            print("Ongeldig formaat (gebruik 1234AB)")
+
+    email = ""
+    while not isEmailValid(email):
+        email = input("E-mailadres: ").strip()
+        if email == "":
+            break
+        if not isEmailValid(email):
+            print("Ongeldig e-mailformaat")
+
+    phone = ""
+    while not isPhoneNumberValid(phone):
+        phone = input("Mobiel nummer (8 cijfers): ").strip()
+        if phone == "":
+            break
+        if not isPhoneNumberValid(phone):
+            print("Voer 8 cijfers in (bijv. 06123456)")
+
+    city_str = ""
+    cities = [city.name for city in CityEnum]
+    while city_str.strip().upper() not in cities:
+        city_str = input(f"Woonplaats ({', '.join(cities)}): ").strip()
+        if city_str == "":
+            break
+        if city_str.upper() not in cities:
+            print("Kies uit de voorgedefinieerde steden")
+
+    
     fields = {
-        "FirstName": input("Nieuwe voornaam: "),
-        "LastName": input("Nieuwe achternaam: "),
-        "Birthday": input("Nieuwe geboortedatum (YYYY-MM-DD): "),
-        "Gender": input("Nieuw geslacht: "),
-        "StreetName": input("Nieuwe straatnaam: "),
-        "HouseNumber": input("Nieuw huisnummer: "),
-        "ZipCode": input("Nieuwe postcode: "),
-        "City": input("Nieuwe woonplaats: "),
-        "MobilePhone": input("Nieuw mobiel nummer: "),
-        "DrivingLicenseNumber": input("Nieuw rijbewijsnummer: ")
+        "First_Name": first,
+        "Last_Name": last,
+        "Birthday": birthday if birthday_str!= "" else birthday_str,
+        "Gender": gender,
+        "Street_Name": street,
+        "House_Number": number if number_str!= "" else number_str,
+        "Zip_Code": zip_code,
+        "City": CityEnum[city_str.upper()] if city_str!= "" else city_str,
+        "Email_Address": email,
+        "Mobile_Phone": phone,
+        "Driving_License_Number": license
     }
 
-    for column, value in fields.items():
-        if value:
-            cursor.execute(
-                f"UPDATE Travellers SET {column} = ? WHERE DrivingLicenseNumber = ?", (value, license))
+    for key, value in fields.items():
+        if value != "" and value is not None:
+            setattr(traveller, key, value)
 
-    connection.commit()
+    updateTravellerInDatabase(connection, traveller)
     print("Gegevens bijgewerkt.")
 
 
 def delete_traveller(connection):
-    license = input(
-        "\nVoer het rijbewijsnummer in van de traveller die je wilt verwijderen: ")
-    confirm = input(
-        f"Weet je zeker dat je traveller met rijbewijsnummer '{license}' wilt verwijderen? (ja/nee): ")
-    if confirm.lower() != "ja":
-        print("Verwijdering geannuleerd.")
-        return
+    license = ""
+    while not isDriversLicenseValid(license):
+        license = input("\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen (XX1234567 of X12345678): ").strip().upper()
+        if not isDriversLicenseValid(license):
+            print("Ongeldig formaat (XX1234567 of X12345678)")
 
     cursor = connection.cursor()
-    cursor.execute(
-        "DELETE FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
-    connection.commit()
+    found = findTravellers(cursor, Driving_License_Number=license)
+    if len(found) <= 0:
+        print("Traveller niet gevonden.")
+        return
+    traveller = found[0]
+    
+    confirm = input(
+        f"Weet je zeker dat je traveller met rijbewijsnummer '{license}' wilt verwijderen? (ja/nee): ")
+    if confirm.lower() == "nee":
+        print("Verwijdering geannuleerd.")
+        return
+    
+    deleteTravellerFromDatabase(connection, license)
 
     print("Traveller verwijderd.")
 
 
 def find_traveller(connection):
-    license = input(
-        "\nVoer het rijbewijsnummer in van de traveller die je zoekt: ")
+    license = ""
+    while not isDriversLicenseValid(license):
+        license = input("\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen (XX1234567 of X12345678): ").strip().upper()
+        if not isDriversLicenseValid(license):
+            print("Ongeldig formaat (XX1234567 of X12345678)")
     cursor = connection.cursor()
-    cursor.execute(
-        "SELECT * FROM Travellers WHERE DrivingLicenseNumber = ?", (license,))
-    result = cursor.fetchone()
-
-    if result:
-        print("\nGegevens van Traveller:")
-        print(f"Voornaam: {result[1]}")
-        print(f"Achternaam: {result[2]}")
-        print(f"Geboortedatum: {result[3]}")
-        print(f"Geslacht: {result[4]}")
-        print(f"Adres: {result[5]} {result[6]}, {result[8]} {result[7]}")
-        print(f"E-mail: {result[9]}")
-        print(f"Mobiel: {result[10]}")
-        print(f"Rijbewijsnummer: {result[11]}")
-    else:
+    found = findTravellers(cursor, Driving_License_Number=license)
+    if len(found) <= 0:
         print("Traveller niet gevonden.")
+        return
+    traveller = found[0]
+
+    print("\nGegevens van Traveller:")
+    print(f"Voornaam: {traveller.First_Name}")
+    print(f"Achternaam: {traveller.Last_Name}")
+    print(f"Geboortedatum: {traveller.Birthday}")
+    print(f"Geslacht: {traveller.Gender}")
+    print(f"Adres: {traveller.Street_Name} {traveller.House_Number}, {traveller.Zip_Code} {traveller.City.value}")
+    print(f"E-mail: {traveller.Email_Address}")
+    print(f"Mobiel: {traveller.Mobile_Phone}")
+    print(f"Rijbewijsnummer: {traveller.Driving_License_Number}")
 
 
 def add_service_engineer(connection):
