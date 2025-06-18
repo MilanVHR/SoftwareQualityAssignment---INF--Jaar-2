@@ -62,7 +62,7 @@ def SetupBackupCodes(cursor: Cursor):
         CREATE TABLE IF NOT EXISTS Backup_Codes (
             Filename VARCHAR PRIMARY KEY NOT NULL,
             Code BLOB NOT NULL,
-            System_Administrator_Username BLOB
-            FOREIGN KEY (Encrypted_Username) REFERENCES System_Administrators(Username)
+            System_Administrator_Username BLOB,
+            FOREIGN KEY(System_Administrator_Username) REFERENCES System_Administrators(Username)
         )
     ''')
