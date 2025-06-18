@@ -29,7 +29,7 @@ def super_admin_menu(connection):
         elif choice == "3":
             traveller_submenu()
         elif choice == "4":
-            scooter_submenu()
+            scooter_submenu(connection)
         elif choice == "5":
             backup_restore_submenu()
         elif choice == "6":
