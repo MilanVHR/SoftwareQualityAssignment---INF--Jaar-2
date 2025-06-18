@@ -8,7 +8,7 @@ from Controllers.Logging import log
 
 
 from Controllers.Validations import isPasswordValid, isUsernameValid
-from Database.DBBackUp import Backup_database
+from Database.DBBackUp import Backup_database, Restore_database
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
 from Model.Backup_Code import addBackUpCodeToDatabase, Backup_Code, deleteBackUpCodeFromDatabase, findBackupCode
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase, findSystemAdministrator, updateSystemAdministratorInDatabase
@@ -35,7 +35,7 @@ def super_admin_menu(connection):
         elif choice == "4":
             scooter_submenu(connection)
         elif choice == "5":
-            backup_restore_submenu(connection)
+            backup_submenu(connection)
         elif choice == "6":
             show_logs_menu()
         elif choice == "0":
@@ -191,7 +191,7 @@ def reset_system_admin_password(connection):
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.")
 
 
-def backup_restore_submenu(connection):
+def backup_submenu(connection):
     while True:
         print("\n--- Backup en Restore ---")
         print("1. Backup maken van systeem")
@@ -206,14 +206,11 @@ def backup_restore_submenu(connection):
             print(f"Back up is aangemaakt: {createdPath}")
             log("Created backup", "super_admin", f"backup filename: {createdPath}")
         elif choice == "2":
-            log("restore code generated", "system_admin")
-            backup_create_code_submenu(connection)  # (nog te implementeren)
+            backup_create_code_submenu(connection)
         elif choice == "3":
-            log("restore code deleted", "system_admin")
-            backup_delete_code_submenu(connection)  # (nog te implementeren)
+            backup_delete_code_submenu(connection)
         elif choice == "4":
-            log("Backup gebruikt", "system_admin")
-            print("+  Backup is benut") # (nog te implementeren)
+            backup_restore_submenu()
         elif choice == "0":
             break
         else:
@@ -304,3 +301,28 @@ def backup_delete_code_submenu(connection):
     deleteBackUpCodeFromDatabase(connection, backupCodes[0].Code)
     print(f"backup code: {backupCodes[0].Code} verwijdert")
     log("backup code created", "super_admin", f"for system admin: {backupCodes[0].System_Administrator_Username}, filename: {backupCodes[0].Filename}")
+
+
+def backup_restore_submenu():
+    while True:
+        print("\n--- Backup herstellen ---")
+        backup_file_names = [f for f in os.listdir("./Backups/") if os.path.isfile(os.path.join("./Backups/", f))]
+        for file in backup_file_names:
+            print(file)
+        print("0. Terug naar vorige menu")
+        choice = input("Voer de naam in van de backup: ")
+
+        if (choice == "0"):
+            return
+        
+        if (choice in backup_file_names):
+            break
+
+    while True:
+        confirmation = input(f"Weet je zeker dat je backup '{choice}' wilt herstellen? (ja/nee):)")
+        if (confirmation.lower() == "ja"):
+            break
+        elif (confirmation.lower() == "nee"):
+            return
+    Restore_database(choice)
+
