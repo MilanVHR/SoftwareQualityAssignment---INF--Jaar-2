@@ -205,6 +205,7 @@ def backup_restore_submenu(connection):
             log("back up created", "system_admin")
             createdPath = Backup_database()
             print(f"Back up is aangemaakt: {createdPath}")
+            log("Created backup", "super_admin", f"backup filename: {createdPath}")
         elif choice == "2":
             log("restore code generated", "system_admin")
             backup_create_code_submenu(connection)  # (nog te implementeren)
