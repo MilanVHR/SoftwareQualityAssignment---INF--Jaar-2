@@ -4,6 +4,7 @@ import sqlite3
 from Controllers.Logging import log, readLog, readSuspiciousLog
 import time
 
+from Controllers.Validations import isSerialNumberValid
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
 from Model.Scooter import Scooter, addScooterToDatabase
