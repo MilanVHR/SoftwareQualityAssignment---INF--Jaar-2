@@ -129,3 +129,31 @@ def reset_system_admin_password():
 
     #  password reset logica + e-mail of melding
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.")  # (nog te implementeren)
+
+
+def backup_restore_submenu():
+    while True:
+        print("\n--- Backup en Restore ---")
+        print("1. Backup maken van systeem")
+        print("2. Restore-code genereren voor System Admin")
+        print("3. Restore-code intrekken")
+        print("4. Backup gebruiken")
+        print("0. Terug naar hoofdmenu")
+
+        choice = input("Maak een keuze: ")
+        if choice == "1":
+            log("back up created", "system_admin")
+            print("→  Backup maken")  # (nog te implementeren)
+        elif choice == "2":
+            log("restore code generated", "system_admin")
+            print("→  Restore-code genereren")  # (nog te implementeren)
+        elif choice == "3":
+            log("restore code deleted", "system_admin")
+            print("→  Restore-code intrekken")  # (nog te implementeren)
+        elif choice == "4":
+            log("Backup gebruikt", "system_admin")
+            print("+  Backup is benut") # (nog te implementeren)
+        elif choice == "0":
+            break
+        else:
+            print("Ongeldige keuze.")
