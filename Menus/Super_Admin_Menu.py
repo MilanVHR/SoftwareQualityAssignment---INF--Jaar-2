@@ -25,9 +25,9 @@ def super_admin_menu(connection):
         if choice == "1":
             system_admin_submenu(connection)
         elif choice == "2":
-            service_engineer_submenu()
+            service_engineer_submenu(connection)
         elif choice == "3":
-            traveller_submenu()
+            traveller_submenu(connection)
         elif choice == "4":
             scooter_submenu()
         elif choice == "5":
