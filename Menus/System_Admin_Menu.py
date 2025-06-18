@@ -28,7 +28,7 @@ def system_admin_menu(connection, username):
         if choice == "4":
             scooter_submenu(connection)
         if choice == "5":
-            backup_restore_submenu_System_Admin()
+            backup_restore_submenu_System_Admin(connection, username)
         if choice == "6":
             show_logs_menu()
         if choice == "0":
@@ -61,7 +61,7 @@ def scooter_submenu(connection):
 
 
 
-def backup_restore_submenu_System_Admin():
+def backup_restore_submenu_System_Admin(connection, username):
     while True:
         print("\n--- Backup en Restore ---")
         print("1. Backup maken van systeem")
@@ -70,8 +70,9 @@ def backup_restore_submenu_System_Admin():
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            log("back up created", "system_admin")
-            print("→  Backup maken")  # (nog te implementeren)
+            createdPath = Backup_database()
+            print(f"Back up is aangemaakt: {createdPath}")
+            log("Created backup", username, f"backup filename: {createdPath}") # (nog te implementeren)
         elif choice == "2":
             log("restore code gebruiken", "system_admin")
             print("→  Restore-code gebruiken om te herstellen")  # (nog te implementeren)
