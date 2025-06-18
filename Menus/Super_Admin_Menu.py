@@ -10,7 +10,7 @@ from Controllers.Logging import log
 from Controllers.Validations import isPasswordValid, isUsernameValid
 from Database.DBBackUp import Backup_database
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
-from Model.Backup_Code import addBackUpCodeToDatabase, Backup_Code
+from Model.Backup_Code import addBackUpCodeToDatabase, Backup_Code, deleteBackUpCodeFromDatabase, findBackupCode
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase, findSystemAdministrator, updateSystemAdministratorInDatabase
 
 
@@ -210,7 +210,7 @@ def backup_restore_submenu(connection):
             backup_create_code_submenu(connection)  # (nog te implementeren)
         elif choice == "3":
             log("restore code deleted", "system_admin")
-            print("→  Restore-code intrekken")  # (nog te implementeren)
+            backup_delete_code_submenu(connection)  # (nog te implementeren)
         elif choice == "4":
             log("Backup gebruikt", "system_admin")
             print("+  Backup is benut") # (nog te implementeren)
@@ -263,12 +263,44 @@ def backup_create_code_submenu(connection):
     backupCode = Backup_Code(
         choice,
         code,
-        system_admin_username
+        system_administrators[0].Username
     )
     addBackUpCodeToDatabase(connection, backupCode)
+
+    print(f"\nBackup code: '{code}' aangemaakt voor: '{system_administrators[0].Username}'")
+    log("backup code created", "super_admin", f"for system admin: {system_administrators[0].Username}, filename: {choice}")
 
 def generate_random_code(length=10):
     # Define the characters to use
     characters = string.ascii_letters + string.digits  # A-Z, a-z, 0-9
     # Generate the random code
     return ''.join(random.choice(characters) for _ in range(length))
+
+def backup_delete_code_submenu(connection):
+    while True:
+        print("\n--- Verwijderen van een Backup Code ---")
+        backupCode = input("Voer code in die verwijdert moet worden: ")
+
+        backupCodes = findBackupCode(connection.cursor(), backupCode)
+        if (len(backupCodes) > 0):
+            print(f"Backup code gevonden met code:'{backupCodes[0].Code}' voor systeem admin:{backupCodes[0].System_Administrator_Username}. Is dit juist?")
+            print("1. Ja, verwijder")
+            print("2. Nee en behou")
+            print("0. Menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "1"):
+                break
+            elif (confirmation == "0"):
+                return
+        else:
+            print(f"Geen backup codes gevonden met code: {backupCode}")
+            print("Opnieuw zoeken?")
+            print("1. Ja")
+            print("2. Nee, menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "2"):
+                return
+    
+    deleteBackUpCodeFromDatabase(connection, backupCodes[0].Code)
+    print(f"backup code: {backupCodes[0].Code} verwijdert")
+    log("backup code created", "super_admin", f"for system admin: {backupCodes[0].System_Administrator_Username}, filename: {backupCodes[0].Filename}")
