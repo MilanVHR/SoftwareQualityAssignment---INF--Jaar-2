@@ -56,3 +56,13 @@ def SetupSystemAdministrator(cursor:Cursor):
             Registration_date DATE
         )
     ''')
+
+def SetupBackupCodes(cursor: Cursor):
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Backup_Codes (
+            Filename VARCHAR PRIMARY KEY NOT NULL,
+            Code BLOB NOT NULL,
+            System_Administrator_Username BLOB
+            FOREIGN KEY (Encrypted_Username) REFERENCES System_Administrators(Username)
+        )
+    ''')

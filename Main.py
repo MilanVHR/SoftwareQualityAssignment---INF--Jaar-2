@@ -74,6 +74,7 @@ if __name__ == "__main__":
     db.SetupTraveller(cursor)
     db.SetupServiceEngineer(cursor)
     db.SetupSystemAdministrator(cursor)
+    db.SetupBackupCodes(cursor)
     # se = Service_Engineer(Username="Milan", Password="Uilskuiken69", First_Name="Milan", Last_Name="Versluis", Registration_date= date(2020, 12, 24))
     # sa = System_Administrator(Username="Esmée", Password="Uilskuiken69", First_Name="Esmée", Last_Name="Biersteker", Registration_date= date(2020, 12, 24))
     # addServiceEngineerToDatabase(connection, se)
