@@ -94,11 +94,11 @@ def scooter_submenu(connection):
         if choice == "1":
             add_scooter_menu(connection)
         elif choice == "2":
-            print("→  Wijzigen van een scooter")  # (nog te implementeren)
+            update_scooter_menu(connection)
         elif choice == "3":
-            print("→  Verwijderen van een scooter")  # (nog te implementeren)
+            delete_scooter_menu(connection)
         elif choice == "4":
-            print("→  Zoekfunctie voor scooter")  # (nog te implementeren)
+            find_scooter_menu(connection)
         elif choice == "0":
             break
         else:
@@ -506,3 +506,36 @@ def add_scooter_menu(connection):
     addScooterToDatabase(connection, toAdd)
     log("added new scooter", "system_admin", f"serial number: {serial_number}")
 
+
+
+def update_scooter_menu(connection):
+    serial = input("\nVoer het serienummer in van de scooter die je wilt wijzigen: ")
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Scooters WHERE Serial_Number = ?", (serial,))
+    if not cursor.fetchone():
+        print("Scooter niet gevonden.")
+        return
+
+    print("Laat velden leeg om ze ongewijzigd te laten.")
+
+    brand = input("Nieuw merk: ")
+    model = input("Nieuw model: ")
+    location = input("Nieuwe locatie: ")
+    is_out = input("Is defect? (ja/nee): ")
+    maintenance = input("Nieuwe datum laatste onderhoud (YYYY-MM-DD): ")
+
+    if brand:
+        cursor.execute("UPDATE Scooters SET Brand = ? WHERE Serial_Number = ?", (brand, serial))
+    if model:
+        cursor.execute("UPDATE Scooters SET Model = ? WHERE Serial_Number = ?", (model, serial))
+    if location:
+        cursor.execute("UPDATE Scooters SET Location = ? WHERE Serial_Number = ?", (location, serial))
+    if is_out in ["ja", "nee"]:
+        cursor.execute("UPDATE Scooters SET Is_Out_Of_Service = ? WHERE Serial_Number = ?",
+                       (1 if is_out == "ja" else 0, serial))
+    if maintenance:
+        cursor.execute("UPDATE Scooters SET Last_Maintenance_Date = ? WHERE Serial_Number = ?",
+                       (maintenance, serial))
+
+    connection.commit()
+    print("Gegevens bijgewerkt.")
