@@ -74,6 +74,10 @@ def add_system_admin(connection):
 
     while True:
         password = input("Wachtwoord: ")
+        print("must have a length of at least 12 characters")
+        print("must be no longer than 30 characters")
+        print("can contain letters (a-z), (A-Z), numbers (0-9), Special characters such as ~!@#$%&_-+=`|\(){}[]:;'<>,.?/")
+        print("must have a combination of at least one lowercase letter, one uppercase letter, one digit, and one special character")
         if (isPasswordValid(password)):
             break
     first_name = input("Voornaam: ")
