@@ -325,4 +325,5 @@ def backup_restore_submenu():
         elif (confirmation.lower() == "nee"):
             return
     Restore_database(choice)
+    log("backup code restored", "super_admin", f"filename: {choice}")
 

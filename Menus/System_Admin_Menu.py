@@ -1,9 +1,10 @@
 from datetime import datetime
 from Controllers.Validations import isSerialNumberValid
 from Controllers.Logging import log
-from Database.DBBackUp import Backup_database
+from Database.DBBackUp import Backup_database, Restore_database
 from Database.DBCheckUser import Roles
 from Menus.Overlapping_Menu import add_scooter_menu, own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
+from Model.Backup_Code import findBackupCode
 from Model.Scooter import addScooterToDatabase, Scooter
 
 
@@ -72,11 +73,31 @@ def backup_restore_submenu_System_Admin(connection, username):
         if choice == "1":
             createdPath = Backup_database()
             print(f"Back up is aangemaakt: {createdPath}")
-            log("Created backup", username, f"backup filename: {createdPath}") # (nog te implementeren)
+            log("Created backup", username, f"backup filename: {createdPath}")
         elif choice == "2":
-            log("restore code gebruiken", "system_admin")
-            print("→  Restore-code gebruiken om te herstellen")  # (nog te implementeren)
+            backup_restore_menu(connection, username)
         elif choice == "0":
             break
         else:
             print("Ongeldige keuze.")
+
+def backup_restore_menu(connection, username):
+    while True:
+        print("\n--- Backup restoren ---")
+        code = input("Voer de herstel code in:")
+        
+        foundBackupCodes = findBackupCode(connection.cursor(), code, username)
+        if (len(foundBackupCodes) == 0):
+            print(f"Geen bruikbare backups gevonden met code: {code}")
+        elif (len(foundBackupCodes) > 0):
+            print(f"Backup code gevonden met code:'{foundBackupCodes[0].Code}'. Is dit juist?")
+            print("1. Ja, herstel deze backup")
+            print("2. Nee")
+            print("0. Menu verlaten")
+            confirmation = input("Maak een keuze:")
+            if (confirmation == "1"):
+                log("backup code restored", username, f"using code: {foundBackupCodes[0].Code}, file: {foundBackupCodes[0].Filename}")
+                Restore_database(foundBackupCodes[0].Filename)
+                break
+            elif (confirmation == "0"):
+                return

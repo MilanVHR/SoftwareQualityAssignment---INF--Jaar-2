@@ -24,7 +24,7 @@ def deleteBackUpCodeFromDatabase(connection:Connection ,Code: str):
     connection.cursor().execute("DELETE FROM Backup_Codes WHERE Code = ?", (Encrypt(Code),))
     connection.commit()
 
-def findBackupCode(cursor, Code):
+def findBackupCode(cursor, Code, systemAdminUsername=None):
     cursor.execute("SELECT * FROM Backup_Codes")
     # Fetching all isnt a very good idea in production
     # however I have not foun a way to support partial
@@ -42,6 +42,10 @@ def findBackupCode(cursor, Code):
         # the " ... is not None check" just skips that parameter if it has not been provided in the function
         if (
         str(Code) not in str(backupCode.Code)):
+            continue
+        if (
+        systemAdminUsername is not None and 
+        str(systemAdminUsername).lower() not in str(backupCode.System_Administrator_Username).lower()):
             continue
 
         backupCodes.append(backupCode)
