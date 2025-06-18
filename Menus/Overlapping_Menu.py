@@ -253,3 +253,33 @@ def add_traveller(connection):
     """, (first, last, birthday, gender, street, number, zip_code, city, email, phone, license))
     connection.commit()
     print("Traveller succesvol toegevoegd.")
+
+
+def update_traveller(connection):
+    email = input("\nVoer het e-mailadres van de traveller in die je wilt wijzigen: ")
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Travellers WHERE EmailAddress = ?", (email,))
+    if not cursor.fetchone():
+        print("Traveller niet gevonden.")
+        return
+
+    print("Laat een veld leeg om het ongewijzigd te laten.")
+    fields = {
+        "FirstName": input("Nieuwe voornaam: "),
+        "LastName": input("Nieuwe achternaam: "),
+        "Birthday": input("Nieuwe geboortedatum (YYYY-MM-DD): "),
+        "Gender": input("Nieuw geslacht: "),
+        "StreetName": input("Nieuwe straatnaam: "),
+        "HouseNumber": input("Nieuw huisnummer: "),
+        "ZipCode": input("Nieuwe postcode: "),
+        "City": input("Nieuwe woonplaats: "),
+        "MobilePhone": input("Nieuw mobiel nummer: "),
+        "DrivingLicenseNumber": input("Nieuw rijbewijsnummer: ")
+    }
+
+    for column, value in fields.items():
+        if value:
+            cursor.execute(f"UPDATE Travellers SET {column} = ? WHERE EmailAddress = ?", (value, email))
+
+    connection.commit()
+    print("Gegevens bijgewerkt.")
