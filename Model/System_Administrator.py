@@ -46,7 +46,8 @@ def decryptSystemAdministrator(encrypted_data):
     )
 
 
-def findSystemAdministrator(cursor, Username=None, First_Name=None, Last_name=None, Registration_date=None):
+    
+def findSystemAdministrator(cursor, Username=None, First_Name=None, Last_name=None, Registration_date=None) -> list[System_Administrator]:
     cursor.execute("SELECT * FROM System_Administrators")
     # Fetching all isnt a very good idea in production
     # however I have not foun a way to support partial
