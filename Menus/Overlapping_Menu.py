@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import datetime
+import re
 import sqlite3
 from Controllers.Logging import log, readLog, readSuspiciousLog
 import time
@@ -7,7 +8,7 @@ import time
 from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
-from Model.Scooter import Scooter, addScooterToDatabase
+from Model.Scooter import Scooter, addScooterToDatabase, findScooters, printScootersList
 from Model.Traveller import CityEnum, Traveller, addTravellerToDatabase, deleteTravellerFromDatabase, findTravellers, updateTravellerInDatabase
 
 
@@ -698,25 +699,83 @@ def delete_scooter_menu(connection):
     print("Scooter verwijderd.")
 
 
-def find_scooter_menu(connection):
-    serial = input("\nVoer het serienummer in van de scooter die je wilt zoeken: ")
+def find_scooter_menu(connection:sqlite3.Connection):
+    print("")
+    search_fields = []
+    valid_fields = [
+        "Serial_Number", "Brand", "Model", "Top_Speed", "Battery_Capacity", "State_of_Charge",
+        "Target_Range_SoC", "Is_Out_Of_Service",
+    ]
+
+    while True:
+        if search_fields:
+            print("\nHuidige zoekvelden:")
+            for field, value in search_fields:
+                print(f"{field}: {value}")
+        print("\nTyp in 'voorbeeld_veld':'voorbeeld_zoek_value' voor de veld die u wilt opzoeken")
+        print("Typ alleen 'zoek' om de query uittevoeren")
+        print("Mogelijke velden:")
+        print(", ".join(valid_fields))
+
+        field = input()
+
+        if field == "zoek":
+            break
+
+        if ':' in field:
+            field, value = field.split(':', 1)
+            field = field.strip()
+            value = value.strip()
+            if field in valid_fields:
+                valid = True
+                if field in ["Top_Speed", "Battery_Capacity", "State_of_Charge", "Mileage"]:
+                    try:
+                        int(value)
+                    except ValueError:
+                        print(f"{field} moet een geheel getal zijn.")
+                        valid = False
+                elif field == "Is_Out_Of_Service":
+                    if value.lower() not in ["true", "false"]:
+                        print(f"{field} moet 'true' of 'false' zijn.")
+                        valid = False
+                elif field == "Target_Range_SoC":
+                    match = re.fullmatch(r"min:(\d+),\s*max:(\d+)", value)
+                    if not match or int(match.group(1)) <= 0 or int(match.group(2)) <= 0:
+                        print(f"{field} moet in het formaat 'min:x, max:x' zijn, waarbij x > 0.")
+                        valid = False
+                if valid:
+                    #Remove old entry for veld if exists
+                    search_fields = [pair for pair in search_fields if pair[0] != field]
+                    search_fields.append((field, value))
+            else:
+                print("\nOngeldig veld, probeer opnieuw.")
+        else:
+            print("\nOngeldige invoer, probeer opnieuw.")
+
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Scooters WHERE Serial_Number = ?", (serial,))
-    scooter = cursor.fetchone()
+    args = {}
+    for veld, waarde in search_fields:
+        if veld in ["Top_Speed", "Battery_Capacity", "State_of_Charge", "Mileage", "amount"]:
+            args[veld] = int(waarde)
+        elif veld == "Is_Out_Of_Service":
+            args[veld] = True if waarde.lower() == "true" else False
+        else:
+            args[veld] = waarde
+    foundScooters = findScooters(cursor, **args)
+    printScootersList(foundScooters)
+    print("0. Terug")
 
-    if not scooter:
-        print("Scooter niet gevonden.")
-        return
+    while True:
+        choice = input("Van welke scooter zou u meer willen weten?: ")
+        if choice == "0":
+            return
+        
+        if not choice.isnumeric():
+            print("Invoer moet numeriek zijn")
+            continue
+        
+        if  not(1 <= int(choice)) or not(int(choice) < len(foundScooters) + 1):
+            print(f"Invoer moet tussen {1} en {len(foundScooters) + 1} zijn")
+            continue
 
-    print("\n🔎 Scootergegevens:")
-    print(f"Serienummer: {scooter[0]}")
-    print(f"Merk: {scooter[1]}")
-    print(f"Model: {scooter[2]}")
-    print(f"Topsnelheid: {scooter[3]} km/u")
-    print(f"Batterijcapaciteit: {scooter[4]} Wh")
-    print(f"SoC: {scooter[5]} %")
-    print(f"Doel-SoC: {scooter[6]} %")
-    print(f"Locatie: {scooter[7]}")
-    print(f"Defect: {'Ja' if scooter[8] else 'Nee'}")
-    print(f"Kilometerstand: {scooter[9]} km")
-    print(f"Laatst onderhouden: {scooter[10]}")
+        print(foundScooters[int(choice)+1])
