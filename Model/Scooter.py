@@ -36,6 +36,12 @@ class Scooter:
         self.Mileage = Mileage
         self.Last_Maintenance_Date = Last_Maintenance_Date
 
+    def __str__(self):
+        return (f"Serienummer: {self.Serial_Number}, Brand: {self.Brand}, Model: {self.Model}, "
+                f"Top snelheid: {self.Top_Speed}, Batterij capaciteit: {self.Battery_Capacity}, Laadstatus: {self.State_of_Charge}, "
+                f"Gewenste laadstatus: {self.Target_Range_SoC}, Locatie: {self.Location}, Is buiten gebruik: {self.Is_Out_Of_Service}, "
+                f"Kilometerstand: {self.Mileage}, Laatste onderhoudsdatum: {self.Last_Maintenance_Date})")
+
 def addScooterToDatabase(connection:Connection, scooter:Scooter):
     connection.cursor().execute("""
         INSERT INTO Scooters 
@@ -121,3 +127,7 @@ def findScooters(cursor, Serial_Number=None, Brand=None, Model=None, Top_Speed=N
         scooters.append(scooter)
 
     return scooters 
+
+def printScootersList(scooters: list[Scooter]):
+    for i, scooter in enumerate(scooters, start=1):
+        print(f"{i}. Serienummer: {scooter.Serial_Number}, Brand: {scooter.Brand}, Model: {scooter.Model}, Laatste onderhoudsdatum: {scooter.Last_Maintenance_Date}")
