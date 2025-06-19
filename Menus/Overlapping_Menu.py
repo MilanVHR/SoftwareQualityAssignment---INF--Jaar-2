@@ -4,7 +4,7 @@ import sqlite3
 from Controllers.Logging import log, readLog, readSuspiciousLog
 import time
 
-from Controllers.Validations import isEmailValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
+from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
 from Model.Scooter import Scooter, addScooterToDatabase
@@ -149,16 +149,25 @@ def update_own_name(connection, username, role):
 
 
 def change_own_password(connection, username, role):
-    newPassword = input("Nieuwe wachtwoord (Enter om te behouden): ")
+    while True:
+        print("Wachtwoord moet een lengte hebben van minimaal 12 tekens")
+        print("Wachtwoord mag niet langer zijn dan 30 tekens")
+        print("Wachtwoord mag letters (a-z), (A-Z), cijfers (0-9), speciale tekens zoals ~!@#$%&_-+=`|$$){}[]:;'<>,.?/ bevatten")
+        print("Wachtwoord moet een combinatie bevatten van minstens één kleine letter, één hoofdletter, één cijfer en één speciaal teken")
+        newPassword = input("Nieuwe wachtwoord (Enter om te behouden): ")
+        if (isPasswordValid(newPassword) or newPassword == ""):
+            break
     cursor = connection.cursor()
     if role == Roles.Service_Engineer:
         if newPassword:
             cursor.execute("UPDATE Service_Engineers SET Password=? WHERE Username=?",
                            (Hash(newPassword), Encrypt(username)))
-        else:
-            if newPassword:
-                cursor.execute("UPDATE System_Administrators SET Password=? WHERE Username=?",
-                               (Hash(newPassword), Encrypt(username)))
+    else:
+        if newPassword:
+            cursor.execute("UPDATE System_Administrators SET Password=? WHERE Username=?",
+                            (Hash(newPassword), Encrypt(username)))
+    connection.commit()
+    print("Wachtwoord bijgewerkt.")
 
 
 def delete_own_account(connection, username, role):
