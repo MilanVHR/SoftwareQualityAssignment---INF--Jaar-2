@@ -778,4 +778,4 @@ def find_scooter_menu(connection:sqlite3.Connection):
             print(f"Invoer moet tussen {1} en {len(foundScooters) + 1} zijn")
             continue
 
-        print(foundScooters[int(choice)+1])
+        print(foundScooters[int(choice)-1])
