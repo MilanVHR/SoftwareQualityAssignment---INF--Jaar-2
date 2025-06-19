@@ -4,7 +4,7 @@ from datetime import date
 import os
 import random
 import string
-from Controllers.Logging import log
+from Controllers.Logging import checkIfUnreadSuspiciousLogs, log
 
 
 from Controllers.Validations import isPasswordValid, isUsernameValid
@@ -23,7 +23,10 @@ def super_admin_menu(connection):
         print("3. Beheer Travellers")
         print("4. Beheer Scooters")
         print("5. Backup en Restore")
-        print("6. Bekijk Logs")
+        if (checkIfUnreadSuspiciousLogs(connection, "super_admin")):
+            print("6. Bekijk Logs ‼ ongelezen verdachte logs ‼")
+        else:
+            print("6. Bekijk Logs")
         print("0. Log uit")
 
         choice = input("Maak een keuze: ")
@@ -38,7 +41,7 @@ def super_admin_menu(connection):
         elif choice == "5":
             backup_submenu(connection)
         elif choice == "6":
-            show_logs_menu()
+            show_logs_menu(connection, "super_admin")
         elif choice == "0":
             print("Je bent uitgelogd.\n")
             break
@@ -88,7 +91,7 @@ def add_system_admin(connection):
             break
     first_name = input("Voornaam: ")
     last_name = input("Achternaam: ")
-    log("New admin user is created", "super_admin", f"username: {username}")
+    log(connection, "New admin user is created", "super_admin", f"username: {username}")
 
     # validatie + encryptie + toevoegen aan database
     toAdd = System_Administrator(
@@ -108,7 +111,7 @@ def delete_system_admin(connection):
     confirm = input(f"Weet je zeker dat je '{username}' wilt verwijderen? (ja/nee): ")
 
     if confirm.lower() == "ja":
-        log("system admin is deleted", "super_admin", f"username: {username}")
+        log(connection, "system admin is deleted", "super_admin", f"username: {username}")
         #  uit database verwijderen
         deleteSystemAdministratorFromDatabase(connection, username)
         print(f"🗑️ '{username}' gemarkeerd voor verwijdering.")
@@ -174,7 +177,7 @@ def update_system_admin(connection):
         
         
     updateSystemAdministratorInDatabase(connection, sysAdminToChange)
-    log("System admin has been updated", "super_admin", f"username: {username}")
+    log(connection, "System admin has been updated", "super_admin", f"username: {username}")
     #  gegevens ophalen, wijzigen in de database
     print(f"Wijziging voor '{username}' gemaakt.")
 
@@ -204,7 +207,7 @@ def reset_system_admin_password(connection):
     updateSystemAdministratorInDatabase(connection, sysAdminToChange)
     
 
-    log("System admin password has been reset", "super_admin", f"username: {username}")
+    log(connection, "System admin password has been reset", "super_admin", f"username: {username}")
 
     #  password reset logica + e-mail of melding
     print(f"🔑 Tijdelijk wachtwoord voor '{username}' is '{temp_password}'.")
@@ -223,13 +226,13 @@ def backup_submenu(connection):
         if choice == "1":
             createdPath = Backup_database()
             print(f"Back up is aangemaakt: {createdPath}")
-            log("Created backup", "super_admin", f"backup filename: {createdPath}")
+            log(connection, "Created backup", "super_admin", f"backup filename: {createdPath}")
         elif choice == "2":
             backup_create_code_submenu(connection)
         elif choice == "3":
             backup_delete_code_submenu(connection)
         elif choice == "4":
-            backup_restore_submenu()
+            backup_restore_submenu(connection)
         elif choice == "0":
             break
         else:
@@ -284,7 +287,7 @@ def backup_create_code_submenu(connection):
     addBackUpCodeToDatabase(connection, backupCode)
 
     print(f"\nBackup code: '{code}' aangemaakt voor: '{system_administrators[0].Username}'")
-    log("backup code created", "super_admin", f"for system admin: {system_administrators[0].Username}, filename: {choice}")
+    log(connection, "backup code created", "super_admin", f"for system admin: {system_administrators[0].Username}, filename: {choice}")
 
 def generate_random_code(length=10):
     # Define the characters to use
@@ -319,10 +322,10 @@ def backup_delete_code_submenu(connection):
     
     deleteBackUpCodeFromDatabase(connection, backupCodes[0].Code)
     print(f"backup code: {backupCodes[0].Code} verwijdert")
-    log("backup code created", "super_admin", f"for system admin: {backupCodes[0].System_Administrator_Username}, filename: {backupCodes[0].Filename}")
+    log(connection, "backup code created", "super_admin", f"for system admin: {backupCodes[0].System_Administrator_Username}, filename: {backupCodes[0].Filename}")
 
 
-def backup_restore_submenu():
+def backup_restore_submenu(connection):
     while True:
         print("\n--- Backup herstellen ---")
         backup_file_names = [f for f in os.listdir("./Backups/") if os.path.isfile(os.path.join("./Backups/", f))]
@@ -344,5 +347,5 @@ def backup_restore_submenu():
         elif (confirmation.lower() == "nee"):
             return
     Restore_database(choice)
-    log("backup code restored", "super_admin", f"filename: {choice}")
+    log(connection, "backup code restored", "super_admin", f"filename: {choice}")
 

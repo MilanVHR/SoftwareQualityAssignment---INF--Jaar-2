@@ -66,3 +66,25 @@ def SetupBackupCodes(cursor: Cursor):
             FOREIGN KEY(System_Administrator_Username) REFERENCES System_Administrators(Username)
         )
     ''')
+
+def SetupLastReadSuspiciousLogs(cursor:Cursor):
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Last_Read_Log (
+            Username BLOB PRIMARY KEY NOT NULL,
+            Read_date DATE
+        )
+    ''')
+
+def SetupLogs(cursor:Cursor):
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Logs (
+            Data BLOB
+        )
+    ''')
+
+def SetupSuspiciousLogs(cursor:Cursor):
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Suspicious_Logs (
+            Data BLOB
+        )
+    ''')

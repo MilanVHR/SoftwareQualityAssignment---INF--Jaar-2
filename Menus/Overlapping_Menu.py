@@ -2,7 +2,7 @@ from datetime import date
 from datetime import datetime
 import re
 import sqlite3
-from Controllers.Logging import log, readLog, readSuspiciousLog
+from Controllers.Logging import checkIfUnreadSuspiciousLogs, log, readLog, readSuspiciousLog
 import time
 
 from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
@@ -193,10 +193,10 @@ def delete_own_account(connection, username, role):
         print("Verwijdering geannuleerd.")
 
 
-def show_logs():
+def show_logs(connection):
     while True:
         print("\n--- Reguliere logs ---")
-        logs = readLog()
+        logs = readLog(connection.cursor())
 
         for log in logs:
             print(log)
@@ -207,10 +207,10 @@ def show_logs():
             break
 
 
-def show_suspicious_logs():
+def show_suspicious_logs(connection, username):
     while True:
         print("\n--- Verdachte logs ---")
-        logs = readSuspiciousLog()
+        logs = readSuspiciousLog(connection, username)
 
         for log in logs:
             print(log)
@@ -221,18 +221,21 @@ def show_suspicious_logs():
             break
 
 
-def show_logs_menu():
+def show_logs_menu(connection, username):
     while True:
         print("\n--- Bekijk logs ---")
         print("1. Bekijk de reguliere logs")
-        print("2. Bekijk de verdachte logs")
+        if (checkIfUnreadSuspiciousLogs(connection, username)):
+            print("2. Bekijk de verdachte logs ‼ ongelezen logs ‼")
+        else:
+            print("2. Bekijk de verdachte logs")
         print("0. Terug naar hoofdmenu")
 
         choice = input("Maak een keuze: ")
         if choice == "1":
-            show_logs()
+            show_logs(connection)
         elif choice == "2":
-            show_suspicious_logs()
+            show_suspicious_logs(connection, username)
         elif choice == "0":
             break
 
@@ -648,7 +651,7 @@ def add_scooter_menu(connection):
         mileage,
         last_maintenance_date)
     addScooterToDatabase(connection, toAdd)
-    log("added new scooter", "system_admin", f"serial number: {serial_number}")
+    log(connection, "added new scooter", "system_admin", f"serial number: {serial_number}")
 
 
 

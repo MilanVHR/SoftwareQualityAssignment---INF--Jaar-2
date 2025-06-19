@@ -1,6 +1,6 @@
 from datetime import datetime
 from Controllers.Validations import isSerialNumberValid
-from Controllers.Logging import log
+from Controllers.Logging import checkIfUnreadSuspiciousLogs, log
 from Database.DBBackUp import Backup_database, Restore_database
 from Database.DBCheckUser import Roles
 from Menus.Overlapping_Menu import add_scooter_menu, own_profile_submenu, scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
@@ -16,7 +16,10 @@ def system_admin_menu(connection, username):
         print("3. Beheer Travellers")
         print("4. Beheer Scooters")
         print("5. Backup en Restore")
-        print("6. Bekijk Logs")
+        if (checkIfUnreadSuspiciousLogs(connection, username)):
+            print("6. Bekijk Logs ‼ ongelezen verdachte logs ‼")
+        else:
+            print("6. Bekijk Logs")
         print("0. Log uit")
 
         choice = input("Maak een keuze: ")
@@ -31,7 +34,7 @@ def system_admin_menu(connection, username):
         if choice == "5":
             backup_restore_submenu_System_Admin(connection, username)
         if choice == "6":
-            show_logs_menu()
+            show_logs_menu(connection, username)
         if choice == "0":
             print("Je bent uitgelogd.\n")
             break
@@ -73,7 +76,7 @@ def backup_restore_submenu_System_Admin(connection, username):
         if choice == "1":
             createdPath = Backup_database()
             print(f"Back up is aangemaakt: {createdPath}")
-            log("Created backup", username, f"backup filename: {createdPath}")
+            log(connection, "Created backup", username, f"backup filename: {createdPath}")
         elif choice == "2":
             backup_restore_menu(connection, username)
         elif choice == "0":
@@ -96,7 +99,7 @@ def backup_restore_menu(connection, username):
             print("0. Menu verlaten")
             confirmation = input("Maak een keuze:")
             if (confirmation == "1"):
-                log("backup code restored", username, f"using code: {foundBackupCodes[0].Code}, file: {foundBackupCodes[0].Filename}")
+                log(connection, "backup code restored", username, f"using code: {foundBackupCodes[0].Code}, file: {foundBackupCodes[0].Filename}")
                 Restore_database(foundBackupCodes[0].Filename)
                 break
             elif (confirmation == "0"):

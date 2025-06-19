@@ -28,25 +28,28 @@ def login_menu(connection):
 
         # TIJDELIJKk: hardcoded superadmin
         if username == "super_admin" and password == "Admin_123?":
-            log("logged in", username)
+            log(connection, "logged in", username)
             super_admin_menu(connection)
+            attempts = 0
         elif role == Roles.System_Admin:
-            log("logged in", username)
+            log(connection, "logged in", username)
             system_admin_menu(connection, username)  # TIJDELIJK
+            attempts = 0
         elif role == Roles.Service_Engineer:
-            log("logged in", username)
+            log(connection, "logged in", username)
             service_engineer_menu(connection, username)  # TIJDELIJK
+            attempts = 0
         else:
             # Checken in de databasse
             attempts += 1
             if (attempts == 3):
-                log("Too many login attempts", "",
+                log(connection, "Too many login attempts", "",
                     f"username: {username} is used for a login attempt with a wrong password", True)
                 print("Teveel inlog pogingen.")
                 login_timeout()
                 attempts = 0
             else:
-                log("Unsuccessful login", "",
+                log(connection, "Unsuccessful login", "",
                     f"username: {username} is used for a login attempt with a wrong password", True)
                 print("Onjuiste inloggegevens.")
             # system_admin_menu() en service_engineer_menu() aanroepen
@@ -76,6 +79,9 @@ if __name__ == "__main__":
     db.SetupServiceEngineer(cursor)
     db.SetupSystemAdministrator(cursor)
     db.SetupBackupCodes(cursor)
+    db.SetupLastReadSuspiciousLogs(cursor)
+    db.SetupLogs(cursor)
+    db.SetupSuspiciousLogs(cursor)
     # se = Service_Engineer(Username="Milan", Password="Uilskuiken69", First_Name="Milan", Last_Name="Versluis", Registration_date= date(2020, 12, 24))
     # sa = System_Administrator(Username="Esmée", Password="Uilskuiken69", First_Name="Esmée", Last_Name="Biersteker", Registration_date= date(2020, 12, 24))
     #s = Scooter("AAAAAAAAAAAA", "AAA", "AAA", 100, 100, 100, 100, (100,100), False, 100, date(2025,10,10))

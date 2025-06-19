@@ -85,7 +85,7 @@ def update_scooter_attributes(connection, username):
                     print("Serienummer moet kleiner dan 17 zijn")
                # (nog te implementeren)
 
-            log("Scooter: State of Charge updated", username, f"scooter serial number: {scooter.Serial_Number}, new SoC: {new_soc}")
+            log(connection, "Scooter: State of Charge updated", username, f"scooter serial number: {scooter.Serial_Number}, new SoC: {new_soc}")
 
             #DB-update
             scooter.State_of_Charge = new_soc
@@ -111,7 +111,7 @@ def update_scooter_attributes(connection, username):
                 elif float(longitude) < -180 or float(longitude) > 180:
                     print("Longitude moet zijn tussen -180 en 180.")
 
-            log("Scooter: location updated", username, f"scooter serial number: {scooter.Serial_Number}, new latitude: {latitude}, new longitude: {longitude}")
+            log(connection, "Scooter: location updated", username, f"scooter serial number: {scooter.Serial_Number}, new latitude: {latitude}, new longitude: {longitude}")
 
             #DB-update
             scooter.Location = (float(latitude),float(longitude))
@@ -128,7 +128,7 @@ def update_scooter_attributes(connection, username):
                 else:
                     print("Ongeldige invoer, typ 'ja' of 'nee'.")
 
-            log("Scooter: status updated", username, f"scooter serial number: {scooter.Serial_Number}, is the scooter out of service: {is_out_of_service}")
+            log(connection, "Scooter: status updated", username, f"scooter serial number: {scooter.Serial_Number}, is the scooter out of service: {is_out_of_service}")
 
             # DB-update
             scooter.Is_Out_Of_Service = is_out_of_service
@@ -144,7 +144,7 @@ def update_scooter_attributes(connection, username):
                 elif int(km) <= 0:
                     print("Kilometerstand moet groter dan 0 zijn.")
 
-            log("Scooter: kilometers updated", username, f"scooter serial number: {scooter.Serial_Number}, new km: {km}")
+            log(connection, "Scooter: kilometers updated", username, f"scooter serial number: {scooter.Serial_Number}, new km: {km}")
 
             # DB-update
             scooter.Mileage = km
@@ -161,7 +161,7 @@ def update_scooter_attributes(connection, username):
                 except ValueError:
                     print("Voer een geldige datum in (YYYY-MM-DD).")
 
-            log("Scooter: service date updated", username, f"scooter serial number: {scooter.Serial_Number}, new date: {date}")
+            log(connection, "Scooter: service date updated", username, f"scooter serial number: {scooter.Serial_Number}, new date: {date}")
 
             # DB-update
             scooter.Last_Maintenance_Date = date.date()
