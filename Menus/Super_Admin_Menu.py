@@ -9,6 +9,7 @@ from Controllers.Logging import log
 
 from Controllers.Validations import isPasswordValid, isUsernameValid
 from Database.DBBackUp import Backup_database, Restore_database
+from Encryption.Encryptor import Hash
 from Menus.Overlapping_Menu import scooter_submenu, service_engineer_submenu, traveller_submenu, show_logs_menu
 from Model.Backup_Code import addBackUpCodeToDatabase, Backup_Code, deleteBackUpCodeFromDatabase, findBackupCode
 from Model.System_Administrator import System_Administrator, addSystemAdministratorToDatabase, deleteSystemAdministratorFromDatabase, findSystemAdministrator, updateSystemAdministratorInDatabase
@@ -78,11 +79,11 @@ def add_system_admin(connection):
             break
 
     while True:
+        print("Wachtwoord moet een lengte hebben van minimaal 12 tekens")
+        print("Wachtwoord mag niet langer zijn dan 30 tekens")
+        print("Wachtwoord mag letters (a-z), (A-Z), cijfers (0-9), speciale tekens zoals ~!@#$%&_-+=`|$$){}[]:;'<>,.?/ bevatten")
+        print("Wachtwoord moet een combinatie bevatten van minstens één kleine letter, één hoofdletter, één cijfer en één speciaal teken")
         password = input("Wachtwoord: ")
-        print("must have a length of at least 12 characters")
-        print("must be no longer than 30 characters")
-        print("can contain letters (a-z), (A-Z), numbers (0-9), Special characters such as ~!@#$%&_-+=`|\(){}[]:;'<>,.?/")
-        print("must have a combination of at least one lowercase letter, one uppercase letter, one digit, and one special character")
         if (isPasswordValid(password)):
             break
     first_name = input("Voornaam: ")
@@ -98,6 +99,7 @@ def add_system_admin(connection):
         date.today()
     )
     addSystemAdministratorToDatabase(connection, toAdd)
+    print("Toegevoegd een nieuwe system administrator\n")
 
 
 def delete_system_admin(connection):
@@ -143,6 +145,7 @@ def update_system_admin(connection):
     while True:
         print("1. Voornaam wijzigen")
         print("2. Achternaam wijzigen")
+        print("3. Wachtwoord wijzigen")
         print("0. Menu verlaten")
         choice = input("Wat wil je wijzigen? ")
 
@@ -154,6 +157,18 @@ def update_system_admin(connection):
             newLastName = input("Vul nieuwe achternaam in: ")
             sysAdminToChange.Last_Name = newLastName
             break
+        elif (choice == "3"):
+            while True:
+                print("Wachtwoord moet een lengte hebben van minimaal 12 tekens")
+                print("Wachtwoord mag niet langer zijn dan 30 tekens")
+                print("Wachtwoord mag letters (a-z), (A-Z), cijfers (0-9), speciale tekens zoals ~!@#$%&_-+=`|$$){}[]:;'<>,.?/ bevatten")
+                print("Wachtwoord moet een combinatie bevatten van minstens één kleine letter, één hoofdletter, één cijfer en één speciaal teken")
+                newPassword = input("Wachtwoord: ")
+                if (isPasswordValid(newPassword)):
+                    break
+            sysAdminToChange.Password = Hash(newPassword)
+            break
+            
         elif (choice == "0"):
             return
         
