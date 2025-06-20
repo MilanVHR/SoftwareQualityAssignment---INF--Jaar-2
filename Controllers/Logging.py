@@ -75,33 +75,33 @@ def checkIfUnreadSuspiciousLogs(connection:Connection, username:str):
     LastReadLog = findLastReadLog(connection.cursor(), username)
 
     # check if any of the logs are dated after the Last Read date
-    # try:
-    # Read and decrypt all lines using readSuspiciousLog
-    decrypted_lines = readSuspiciousLog(connection, username)
-    if (len(decrypted_lines) == 0):
-        return False
-    elif (LastReadLog is None):
-        return True
-    
-    # Loop through each decrypted line
-    for decrypted_line in decrypted_lines:
-        if (decrypted_line == "corrupted log"):
-            continue
-        try:
-            # Convert each decrypted line to datetime
-            parts = [part.strip() for part in decrypted_line.split(',')]
-            # Combine the date and time parts
-            date_time_str = parts[0] + ' ' + parts[1]
-            # Convert to datetime object
-            line_datetime = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
+    try:
+        # Read and decrypt all lines using readSuspiciousLog
+        decrypted_lines = readSuspiciousLog(connection, username)
+        if (len(decrypted_lines) == 0):
+            return False
+        elif (LastReadLog is None):
+            return True
+        
+        # Loop through each decrypted line
+        for decrypted_line in decrypted_lines:
+            if (decrypted_line == "corrupted log"):
+                continue
+            try:
+                # Convert each decrypted line to datetime
+                parts = [part.strip() for part in decrypted_line.split(',')]
+                # Combine the date and time parts
+                date_time_str = parts[0] + ' ' + parts[1]
+                # Convert to datetime object
+                line_datetime = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
 
-            # Check if the line's datetime is after LastRead
-            if line_datetime > LastReadLog.Read_date.replace(tzinfo=None):
-                return True
-        except ValueError:
-            # Skip lines that cannot be parsed as datetime
-            continue
-    # except Exception:
-    #     # Handle unexpected issues
-    #     return False
+                # Check if the line's datetime is after LastRead
+                if line_datetime > LastReadLog.Read_date.replace(tzinfo=None):
+                    return True
+            except ValueError:
+                # Skip lines that cannot be parsed as datetime
+                continue
+    except Exception:
+        # Handle unexpected issues
+        return False
     return False
