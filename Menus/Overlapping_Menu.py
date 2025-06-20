@@ -8,7 +8,7 @@ import time
 from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
-from Model.Scooter import Scooter, addScooterToDatabase, findScooters, printScootersList
+from Model.Scooter import Scooter, addScooterToDatabase, findScooters, printScootersList, updateScooterInDatabase
 from Model.Traveller import CityEnum, Traveller, addTravellerToDatabase, deleteTravellerFromDatabase, findTravellers, printTravellersList, updateTravellerInDatabase
 
 
@@ -697,33 +697,144 @@ def add_scooter_menu(connection):
 def update_scooter_menu(connection):
     serial = input("\nVoer het serienummer in van de scooter die je wilt wijzigen: ")
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Scooters WHERE Serial_Number = ?", (serial,))
-    if not cursor.fetchone():
+    found = findScooters(cursor, Serial_Number=serial)
+    if not found:
         print("Scooter niet gevonden.")
         return
+    scooter = found[0]
 
     print("Laat velden leeg om ze ongewijzigd te laten.")
 
     brand = input("Nieuw merk: ")
+    if brand != "":
+        scooter.Brand = brand
+
     model = input("Nieuw model: ")
-    location = input("Nieuwe locatie: ")
-    is_out = input("Is defect? (ja/nee): ")
-    maintenance = input("Nieuwe datum laatste onderhoud (YYYY-MM-DD): ")
+    if model != "":
+        scooter.Model = model
 
-    if brand:
-        cursor.execute("UPDATE Scooters SET Brand = ? WHERE Serial_Number = ?", (brand, serial))
-    if model:
-        cursor.execute("UPDATE Scooters SET Model = ? WHERE Serial_Number = ?", (model, serial))
-    if location:
-        cursor.execute("UPDATE Scooters SET Location = ? WHERE Serial_Number = ?", (location, serial))
-    if is_out in ["ja", "nee"]:
-        cursor.execute("UPDATE Scooters SET Is_Out_Of_Service = ? WHERE Serial_Number = ?",
-                       (1 if is_out == "ja" else 0, serial))
-    if maintenance:
-        cursor.execute("UPDATE Scooters SET Last_Maintenance_Date = ? WHERE Serial_Number = ?",
-                       (maintenance, serial))
+    top_speed_input = ""
+    while not top_speed_input.isnumeric() or int(top_speed_input) < 0:
+        top_speed_input = input("Voer de nieuwe top speed van de scooter in, alleen nummer en grooter dan 0: ")
+        if top_speed_input == "":
+            break
+        if not top_speed_input.isnumeric():
+            print("Gebruik alleen maar nummers")
+            continue
+        if top_speed_input.isnumeric() and int(top_speed_input) < 0:
+            print("Top speed moet grooter dan")
+            continue
+        scooter.Top_Speed = int(top_speed_input)
+    
+    # batt capp
+    battery_capacity_input = ""
+    while not battery_capacity_input.isnumeric() or int(battery_capacity_input) < 0:
+        battery_capacity_input = input("Voer de nieuwe batterijcapaciteit de scooter in, alleen nummer en grooter dan 0: ")
+        if battery_capacity_input == "":
+            break
+        if battery_capacity_input.isnumeric() and int(battery_capacity_input) > 0:
+            scooter.Battery_Capacity = int(battery_capacity_input)
 
-    connection.commit()
+    # soc
+    soc_input = ""
+    while not soc_input.isnumeric() or not (0 <= int(soc_input) <= 100):
+        soc_input = input("Voer de nieuwe State of Charge (0-100%) in: ")
+        if soc_input == "":
+            break
+        if soc_input.isnumeric() and (0 <= int(soc_input) <= 100):
+            scooter.State_of_Charge = int(soc_input)
+    
+    #target soc
+
+    min_soc = float(scooter.Target_Range_SoC.split(",")[0].strip("min: ").strip("%"))
+    max_soc = float(scooter.Target_Range_SoC.split(",")[1].strip("max: ").strip("%"))
+    while True:
+        min_soc_input = ""
+        while not min_soc_input.isnumeric() or not (0 <= int(min_soc_input) <= 100):
+            min_soc_input = input("Voer het minimale Target Range SoC in (0-100): ")
+            if min_soc_input == "":
+                break
+            if min_soc_input.isnumeric() and (0 <= int(min_soc_input) <= 100):
+                min_soc = int(min_soc_input)
+
+        max_soc_input = ""
+        while not max_soc_input.isnumeric() or not (0 <= int(max_soc_input) <= 100) or int(max_soc_input) < min_soc:
+            max_soc_input = input(f"Voer het maximale Target Range SoC in (tussen {min_soc} en 100): ")
+            if max_soc_input == "":
+                break
+            if max_soc_input.isnumeric() and (0 <= int(max_soc_input) <= 100) and int(max_soc_input) > min_soc:
+                max_soc = int(max_soc_input)
+        
+        if min_soc_input == "" and max_soc_input == "":
+                break
+        if max_soc < min_soc:
+            print("het minimale target range is grooter dan maximale range")
+            continue
+        
+        current_min = float(scooter.Target_Range_SoC.split(",")[0].strip("min: ").strip("%"))
+        current_max = float(scooter.Target_Range_SoC.split(",")[1].strip("max: ").strip("%"))
+        if min_soc_input == "" and max_soc_input != "":
+                scooter.Target_Range_SoC = f"min: {current_min}%, max: {max_soc}%"
+                break
+        if min_soc_input != "" and max_soc_input == "":
+                scooter.Target_Range_SoC = f"min: {min_soc}%, max: {current_max}%"
+                break
+        if min_soc_input != "" and max_soc_input != "":
+                scooter.Target_Range_SoC = f"min: {min_soc}%, max: {max_soc}%"
+                break
+    
+
+    lat_valid = False
+    while not lat_valid:
+        try:
+            lat = input("Nieuwe latitude in: ")
+            if lat == "":
+                break
+            lat_float = float(lat)
+            scooter.Location = (lat_float, scooter.Location[1])
+            
+            lat_valid = True
+        except ValueError:
+            print("Ongeldige invoer, probeer opnieuw.")
+    
+    lon_valid = False
+    while not lon_valid:
+        try:
+            lon = input("Nieuwe longitude in: ")
+            if lon == "":
+                break
+            lon_float = float(lon)
+            scooter.Location = (scooter.Location[0], lon_float)
+            
+            lon_valid = True
+        except ValueError:
+            print("Ongeldige invoer, probeer opnieuw.")
+    
+    valid_oos = False
+    while not valid_oos:
+        out_of_service_input = input("Is de scooter buiten gebruik? (ja/nee): ").strip().lower()
+        if out_of_service_input == "":
+            break
+        if out_of_service_input in ("ja", "nee"):
+            scooter.Is_Out_Of_Service = out_of_service_input == "ja"
+            valid_oos = True
+        else:
+            print("Ongeldige invoer, typ 'ja' of 'nee'.")
+    valid_date = False
+
+    while not valid_date:
+        date_input = input("Voer de laatste onderhoudsdatum in (DD-MM-YYYY): ")
+        if date_input == "":
+            break
+        try:
+            scooter.Last_Maintenance_Date = datetime.strptime(date_input, "%d-%m-%Y").date()
+            valid_date = True
+        except ValueError:
+            print("Ongeldige datum, probeer opnieuw.")
+
+
+    updateScooterInDatabase(connection, scooter)
+
     print("Gegevens bijgewerkt.")
 
 
