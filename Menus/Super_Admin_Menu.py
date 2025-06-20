@@ -343,7 +343,7 @@ def backup_restore_submenu(connection):
             break
 
     while True:
-        confirmation = input(f"Weet je zeker dat je backup '{choice}' wilt herstellen? (ja/nee):)")
+        confirmation = input(f"Weet je zeker dat je backup '{choice}' wilt herstellen? (ja/nee):")
         if (confirmation.lower() == "ja"):
             break
         elif (confirmation.lower() == "nee"):
