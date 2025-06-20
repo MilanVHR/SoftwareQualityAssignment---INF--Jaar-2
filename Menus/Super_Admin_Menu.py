@@ -80,6 +80,8 @@ def add_system_admin(connection):
         username = input("Gebruikersnaam (8-10 tekens): ")
         if (isUsernameValid(username)):
             break
+        else:
+            print("Gebruikersnaam moet tussen 8-10 tekens zitten")
 
     while True:
         print("Wachtwoord moet een lengte hebben van minimaal 12 tekens")
