@@ -5,7 +5,7 @@ import sqlite3
 from Controllers.Logging import checkIfUnreadSuspiciousLogs, log, readLog, readSuspiciousLog
 import time
 
-from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumberValid, isSerialNumberValid, isZipcodeValid, isDriversLicenseValid
+from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumberValid, isSerialNumberValid, isUsernameValid, isZipcodeValid, isDriversLicenseValid
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
 from Model.Scooter import Scooter, addScooterToDatabase, findScooters, printScootersList, updateScooterInDatabase
@@ -516,10 +516,22 @@ def find_traveller(connection):
 
 def add_service_engineer(connection):
     print("\n--- Nieuwe Service Engineer toevoegen ---")
-    username = input("Gebruikersnaam: ")
+    while True:
+        username = input("Gebruikersnaam (8-10 tekens): ")
+        if (isUsernameValid(username)):
+            break
+        else:
+            print("Gebruikersnaam moet tussen 8-10 tekens zitten")
     first_name = input("Voornaam: ")
     last_name = input("Achternaam: ")
-    password = input("Wachtwoord: ")
+    while True:
+        print("Wachtwoord moet een lengte hebben van minimaal 12 tekens")
+        print("Wachtwoord mag niet langer zijn dan 30 tekens")
+        print("Wachtwoord mag letters (a-z), (A-Z), cijfers (0-9), speciale tekens zoals ~!@#$%&_-+=`|$$){}[]:;'<>,.?/ bevatten")
+        print("Wachtwoord moet een combinatie bevatten van minstens één kleine letter, één hoofdletter, één cijfer en één speciaal teken")
+        password = input("Wachtwoord: ")
+        if (isPasswordValid(password)):
+            break
 
     cursor = connection.cursor()
     cursor.execute(

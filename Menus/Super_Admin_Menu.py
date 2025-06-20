@@ -80,6 +80,8 @@ def add_system_admin(connection):
         username = input("Gebruikersnaam (8-10 tekens): ")
         if (isUsernameValid(username)):
             break
+        else:
+            print("Gebruikersnaam moet tussen 8-10 tekens zitten")
 
     while True:
         print("Wachtwoord moet een lengte hebben van minimaal 12 tekens")
@@ -341,7 +343,7 @@ def backup_restore_submenu(connection):
             break
 
     while True:
-        confirmation = input(f"Weet je zeker dat je backup '{choice}' wilt herstellen? (ja/nee):)")
+        confirmation = input(f"Weet je zeker dat je backup '{choice}' wilt herstellen? (ja/nee):")
         if (confirmation.lower() == "ja"):
             break
         elif (confirmation.lower() == "nee"):

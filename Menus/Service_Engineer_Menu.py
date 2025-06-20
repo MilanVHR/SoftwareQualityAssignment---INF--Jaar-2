@@ -3,7 +3,7 @@ import sqlite3
 
 from Controllers.Logging import log
 from Database.DBCheckUser import Roles
-from Menus.Overlapping_Menu import own_profile_submenu
+from Menus.Overlapping_Menu import find_scooter_menu, own_profile_submenu
 from Model.Scooter import Scooter, findScooters, updateScooterInDatabase
 
 
@@ -22,7 +22,7 @@ def service_engineer_menu(connection, username):
         elif choice == "2":
             update_scooter_attributes(connection, username)
         elif choice == "3":
-            search_scooter(username)
+            find_scooter_menu(connection)
         elif choice == "0":
             print("Je bent uitgelogd.\n")
             break
@@ -172,7 +172,3 @@ def update_scooter_attributes(connection, username):
             return
         else:
             print("Ongeldige keuze.")
-
-
-def search_scooter():
-    return

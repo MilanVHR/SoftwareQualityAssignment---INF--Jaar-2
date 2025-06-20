@@ -86,6 +86,6 @@ if __name__ == "__main__":
     # sa = System_Administrator(Username="Esmée", Password="Uilskuiken69", First_Name="Esmée", Last_Name="Biersteker", Registration_date= date(2020, 12, 24))
     #s = Scooter("AAAAAAAAAAAA", "AAA", "AAA", 100, 100, 100, 100, (100,100), False, 100, date(2025,10,10))
     # addServiceEngineerToDatabase(connection, se)
-    # addSystemAdministratorToDatabase(connection, se)
+    # addSystemAdministratorToDatabase(connection, sa)
     #addScooterToDatabase(connection,s)
     login_menu(connection)

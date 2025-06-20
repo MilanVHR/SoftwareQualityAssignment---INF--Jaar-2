@@ -13,9 +13,10 @@ def logString(connection, message, critical=False):
     # Encrypt the message
     encrypted_message = Encrypt(message)
 
-    insertLog(connection, encrypted_message)
     if (critical):
         insertSusLog(connection, encrypted_message)
+    else:
+        insertLog(connection, encrypted_message)
 
 
 def log(connection, description: str, Username: str = "", additional: str = "", critical: bool = False):
