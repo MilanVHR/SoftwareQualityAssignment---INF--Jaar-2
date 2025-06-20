@@ -203,3 +203,7 @@ def findTravellers(cursor, Driving_License_Number=None, First_Name=None, Last_Na
         travellers.append(traveller)
 
     return travellers
+
+def printTravellersList(travellers: list[Traveller]):
+    for i, traveller in enumerate(travellers, start=1):
+        print(f"{i}. Namen: {traveller.First_Name} {traveller.Last_Name}, Geboortedatum: {traveller.Birthday}, Adres: {traveller.Street_Name} {traveller.House_Number}, {traveller.Zip_Code} {traveller.City.value}, Rijbewijsnummer: {traveller.Driving_License_Number}, Email: {traveller.Email_Address}, Mobiel: {traveller.Mobile_Phone}")

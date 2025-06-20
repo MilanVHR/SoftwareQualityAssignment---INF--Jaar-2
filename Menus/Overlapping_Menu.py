@@ -9,7 +9,7 @@ from Controllers.Validations import isEmailValid, isPasswordValid, isPhoneNumber
 from Database.DBCheckUser import Roles
 from Encryption.Encryptor import Decrypt, Encrypt, Hash
 from Model.Scooter import Scooter, addScooterToDatabase, findScooters, printScootersList
-from Model.Traveller import CityEnum, Traveller, addTravellerToDatabase, deleteTravellerFromDatabase, findTravellers, updateTravellerInDatabase
+from Model.Traveller import CityEnum, Traveller, addTravellerToDatabase, deleteTravellerFromDatabase, findTravellers, printTravellersList, updateTravellerInDatabase
 
 
 def own_profile_submenu(connection, username, role):
@@ -452,27 +452,66 @@ def delete_traveller(connection):
 
 
 def find_traveller(connection):
-    license = ""
-    while not isDriversLicenseValid(license):
-        license = input("\nVoer het rijbewijsnummer van de traveller in die je wilt wijzigen (XX1234567 of X12345678): ").strip().upper()
-        if not isDriversLicenseValid(license):
-            print("Ongeldig formaat (XX1234567 of X12345678)")
-    cursor = connection.cursor()
-    found = findTravellers(cursor, Driving_License_Number=license)
-    if len(found) <= 0:
-        print("Traveller niet gevonden.")
-        return
-    traveller = found[0]
+    print("")
+    search_fields = []
+    valid_fields = [
+        "Driving_License_Number", "First_Name", "Last_Name", "Birthday", "Gender", "Street_Name",
+        "House_Number", "Zip_Code", "City", "Email_Address", "Mobile_Phone"
+    ]
 
-    print("\nGegevens van Traveller:")
-    print(f"Voornaam: {traveller.First_Name}")
-    print(f"Achternaam: {traveller.Last_Name}")
-    print(f"Geboortedatum: {traveller.Birthday}")
-    print(f"Geslacht: {traveller.Gender}")
-    print(f"Adres: {traveller.Street_Name} {traveller.House_Number}, {traveller.Zip_Code} {traveller.City.value}")
-    print(f"E-mail: {traveller.Email_Address}")
-    print(f"Mobiel: {traveller.Mobile_Phone}")
-    print(f"Rijbewijsnummer: {traveller.Driving_License_Number}")
+    while True:
+        if search_fields:
+            print("\nHuidige zoekvelden:")
+            for field, value in search_fields:
+                print(f"{field}: {value}")
+        print("\nTyp in 'voorbeeld_veld':'voorbeeld_zoek_value' voor de veld die u wilt opzoeken")
+        print("Typ alleen 'zoek' om de query uittevoeren")
+        print("Mogelijke velden:")
+        print(", ".join(valid_fields))
+
+        field = input()
+
+        if field == "zoek":
+            break
+
+        if not(':' in field):
+            print("\nOngeldige invoer, probeer opnieuw.")
+            continue
+
+        field, value = field.split(':', 1)
+        field = field.strip()
+        value = value.strip()
+
+        if not (field in valid_fields):
+            print("\nOngeldig veld, probeer opnieuw.")
+            continue
+
+        valid = True
+        if field == "House_Number":
+            try:
+                int(value)
+            except ValueError:
+                print(f"{field} moet een geheel getal zijn.")
+                valid = False
+        if valid:
+            #Remove old entry for veld if exists
+            search_fields = [pair for pair in search_fields if pair[0] != field]
+            search_fields.append((field, value))
+        
+    cursor = connection.cursor()
+    args = {}
+    for field, value in search_fields:
+        if field == "House_Number":
+            args[field] = int(value)
+        else:
+            args[field] = value
+    foundTravellers = findTravellers(cursor, **args)
+    printTravellersList(foundTravellers)
+    
+    
+            
+    
+
 
 
 def add_service_engineer(connection):
